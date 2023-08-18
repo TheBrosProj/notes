@@ -50,7 +50,7 @@ const TodoList: React.FC = () => {
         //     });
 
         //     if (response.ok) {
-                const newTodo : Todo = { id: 1, "data": input, "state": "active", "time": moment.now() }
+                const newTodo : Todo = { id: 1, "data": input, state: "active", time: moment.now() }
                 setTodos([...todos, newTodo]);
                 setInput('');
         //     }
@@ -81,7 +81,7 @@ const TodoList: React.FC = () => {
         // });
 
         // if (response.ok) {
-            setTodos([...todos.filter(t => t["data"] !== todo["data"]), { id: todo["id"], "data": todo["data"], "state": "completed", "time": moment.now() }])
+            setTodos([...todos.filter(t => t["data"] !== todo["data"]), { id: todo["id"], data : todo["data"], state: "completed", time: moment.now() }])
         // }
     };
 
@@ -96,7 +96,7 @@ const TodoList: React.FC = () => {
         // });
 
         // if (response.ok) {
-            setTodos([...todos.filter(t => t["data"] !== todo["data"]), { id: todo["id"], data : todo["data"], "state": "active", "time": moment.now() }])
+            setTodos([...todos.filter(t => t["data"] !== todo["data"]), { id: todo["id"], data : todo["data"], state: "active", time: moment.now() }])
         // }
     };
     return (
