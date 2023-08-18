@@ -46,7 +46,7 @@ const Notes: React.FC = () => {
         } catch (error) {
             console.error("Error fetching notes", error);
         } finally {
-            setIsLoading(false);
+            setIsLoading(true);
         }
     };
 
