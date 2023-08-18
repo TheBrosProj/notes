@@ -7,6 +7,7 @@ import {
     InputGroup,
     InputRightElement,
     SimpleGrid,
+    Skeleton,
 } from "@chakra-ui/react";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -22,6 +23,8 @@ type Note = {
 const Notes: React.FC = () => {
     const [notes, setNotes] = useState<Note[]>([]);
     const [input, setInput] = useState<string>("");
+    const [isLoading, setIsLoading] = useState(false);
+
     const { user } = useAuth();
 
     useEffect(() => {
@@ -42,6 +45,8 @@ const Notes: React.FC = () => {
             }
         } catch (error) {
             console.error("Error fetching notes", error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -118,18 +123,43 @@ const Notes: React.FC = () => {
                         />
                     </InputRightElement>
                 </InputGroup>
-                <SimpleGrid minChildWidth='xs' spacing='4' p={'2'}>
-                    {notes.map((note) => (
-                        <Box key={note.id} boxShadow={'md'} borderRadius={'md'}>
-                            <CustomEditable
-                                content={note.details}
-                                handleDelete={() => {
-                                    handleDelete(note);
-                                }}
-                            />
-                        </Box>
-                    ))}
-                </SimpleGrid>
+                { isLoading ?
+                    <>
+                    <SimpleGrid minChildWidth='xs' spacing='4' p={'2'}>
+                        <Skeleton boxShadow={'md'} borderRadius={'md'}>
+                            <div>please wait while we load todos</div>
+                            <div>please wait while we load todos</div>
+                            <div>please wait while we load todos</div>
+                        </Skeleton>
+                        <Skeleton  boxShadow={'md'} borderRadius={'md'}>
+                            <div>please wait while we load todos</div>
+                            <div>please wait while we load todos</div>
+                            <div>please wait while we load todos</div>
+                        </Skeleton>
+                        <Skeleton  boxShadow={'md'} borderRadius={'md'}>
+                            <div>please wait while we load todos</div>
+                            <div>please wait while we load todos</div>
+                            <div>please wait while we load todos</div>
+                        </Skeleton>
+                        <Skeleton  boxShadow={'md'} borderRadius={'md'}>
+                            <div>please wait while we load todos</div>
+                            <div>please wait while we load todos</div>
+                            <div>please wait while we load todos</div>
+                        </Skeleton>
+                        </SimpleGrid>
+                    </> :
+                    <SimpleGrid minChildWidth='xs' spacing='4' p={'2'}>
+                        {notes.map((note) => (
+                            <Box key={note.id} boxShadow={'md'} borderRadius={'md'}>
+                                <CustomEditable
+                                    content={note.details}
+                                    handleDelete={() => {
+                                        handleDelete(note);
+                                    }}
+                                />
+                            </Box>
+                        ))}
+                    </SimpleGrid>}
             </Box>
         </Center>
     );

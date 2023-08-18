@@ -2,7 +2,7 @@ import { Box, Flex, Avatar, Button, Image, Menu, MenuButton, MenuList, MenuItem,
 import Link from 'next/link';
 import { auth } from '@/lib/firebase';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDownload, faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
+import { faAngleDown, faDownload, faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthContext';
 import { useEffect } from 'react';
@@ -24,7 +24,7 @@ export default function Navbar() {
             </Link>
             {isSmallScreen ? (
                 <Menu>
-                    <MenuButton aria-label='menu open button' as={Button} rightIcon={<FontAwesomeIcon icon={faDownload} />}>
+                    <MenuButton aria-label='menu open button' as={Button} rightIcon={<FontAwesomeIcon icon={faAngleDown} />}>
                         Menu
                     </MenuButton>
                     <MenuList>

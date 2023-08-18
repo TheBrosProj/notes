@@ -11,10 +11,10 @@ import {
     Input,
     InputGroup,
     InputRightElement,
+    Skeleton,
 } from "@chakra-ui/react";
 import { faCheck, faPlus, faRepeat, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import moment from "moment/moment";
 import { useAuth } from "./AuthContext";
 
 interface Todo {
@@ -27,6 +27,7 @@ interface Todo {
 const TodoList: React.FC = () => {
     const [todos, setTodos] = useState<Todo[]>([]);
     const [input, setInput] = useState<string>("");
+    const [isLoading, setIsLoading] = useState(true);
     const { user } = useAuth();
 
     useEffect(() => {
@@ -47,6 +48,8 @@ const TodoList: React.FC = () => {
             }
         } catch (error) {
             console.error("Error fetching todos", error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -86,7 +89,7 @@ const TodoList: React.FC = () => {
                     todo_id: todo.id,
                 }),
             });
-    
+
             if (response.ok) {
                 setTodos([...todos.filter((t) => t.id !== todo.id)]);
             } else {
@@ -96,7 +99,7 @@ const TodoList: React.FC = () => {
             console.error("Error deleting todo", error);
         }
     };
-    
+
     const handleCompletion = async (todo: Todo) => {
         try {
             const response = await fetch(`/api/todo/${user.uid}`, {
@@ -109,9 +112,9 @@ const TodoList: React.FC = () => {
                     state: "completed",
                 }),
             });
-    
+
             if (response.ok) {
-                const updatedTodo : Todo = { ...todo, state: "completed" };
+                const updatedTodo: Todo = { ...todo, state: "completed" };
                 setTodos([...todos.filter(t => t.id !== todo.id), updatedTodo]);
             } else {
                 console.error("Failed to complete todo");
@@ -120,7 +123,7 @@ const TodoList: React.FC = () => {
             console.error("Error completing todo", error);
         }
     };
-    
+
     const handleRevive = async (todo: Todo) => {
         try {
             const response = await fetch(`/api/todo/${user.uid}`, {
@@ -133,9 +136,9 @@ const TodoList: React.FC = () => {
                     state: "active",
                 }),
             });
-    
+
             if (response.ok) {
-                const updatedTodo : Todo = { ...todo, state: "active" };
+                const updatedTodo: Todo = { ...todo, state: "active" };
                 setTodos([...todos.filter(t => t.id !== todo.id), updatedTodo]);
             } else {
                 console.error("Failed to revive todo");
@@ -146,7 +149,6 @@ const TodoList: React.FC = () => {
     };
     return (
         <Center>
-
             <Box
                 p="2"
                 m="2"
@@ -179,65 +181,80 @@ const TodoList: React.FC = () => {
                         />
                     </InputRightElement>
                 </InputGroup>
-                <Box mt="4">
-                    {todos
-                        .filter(todo => todo["state"] === 'active')
-                        .map((todo) => (
-                            <Flex
-                                key={todo["id"]} align="center" m="2" p="2" justify="space-between"
-                                // border={'1px solid gray'} 
-                                borderRadius={'md'}
-                                boxShadow={'md'}
-                            >
-                                <Editable defaultValue={todo.details} fontWeight={"bold"}>
-                                    <EditablePreview />
-                                    <EditableInput />
-                                </Editable>
-                                <Flex>
-                                    <IconButton
-                                        aria-label="Complete todo"
-                                        icon={<FontAwesomeIcon icon={faCheck} />}
-                                        onClick={() => handleCompletion(todo)}
-                                    />
-                                    <IconButton
-                                        aria-label="Delete todo"
-                                        icon={<FontAwesomeIcon icon={faTrash} />}
-                                        ml="2"
-                                        onClick={() => handleDelete(todo)}
-                                    />
+                {isLoading ?
+                    <>
+                        <Skeleton m={'2'}>
+                            <div>please wait while we load todos</div>
+                            <div>please wait while we load todos</div>
+                        </Skeleton>
+                        <Skeleton m={'2'}>
+                            <div>please wait while we load todos</div>
+                            <div>please wait while we load todos</div>
+                        </Skeleton>
+                        <Skeleton m={'2'}>
+                            <div>please wait while we load todos</div>
+                            <div>please wait while we load todos</div>
+                        </Skeleton>
+                    </> :
+                    <Box mt="4">
+                        {todos
+                            .filter(todo => todo["state"] === 'active')
+                            .map((todo) => (
+                                <Flex
+                                    key={todo["id"]} align="center" m="2" p="2" justify="space-between"
+                                    // border={'1px solid gray'} 
+                                    borderRadius={'md'}
+                                    boxShadow={'md'}
+                                >
+                                    <Editable defaultValue={todo.details} fontWeight={"bold"}>
+                                        <EditablePreview />
+                                        <EditableInput />
+                                    </Editable>
+                                    <Flex>
+                                        <IconButton
+                                            aria-label="Complete todo"
+                                            icon={<FontAwesomeIcon icon={faCheck} />}
+                                            onClick={() => handleCompletion(todo)}
+                                        />
+                                        <IconButton
+                                            aria-label="Delete todo"
+                                            icon={<FontAwesomeIcon icon={faTrash} />}
+                                            ml="2"
+                                            onClick={() => handleDelete(todo)}
+                                        />
+                                    </Flex>
                                 </Flex>
-                            </Flex>
-                        ))}
-                    {todos
-                        .filter((t) => t["state"] === "completed")
-                        .map((todo) => (
-                            <Flex
-                                key={todo["id"]} align="center" m="2" p="2" paddingX="2" justify="space-between"
-                                // border={'1px solid gray'} 
-                                borderRadius={'md'}
-                                boxShadow={'md'}
-                            >
-                                <Text as="s" fontWeight={"bold"}>{todo["details"]}</Text>
-                                <Flex>
-                                    <IconButton
-                                        aria-label="Revive todo"
-                                        icon={<FontAwesomeIcon icon={faRepeat} />}
-                                        onClick={() => handleRevive(todo)}
-                                    />
-                                    <IconButton
-                                        aria-label="Delete todo"
-                                        icon={<FontAwesomeIcon icon={faTrash} />}
-                                        ml="2"
-                                        onClick={() => handleDelete(todo)}
-                                    />
-                                </Flex>
-                                {/* <Editable isDisabled defaultValue={todo["data"]} fontWeight={"bold"} >
+                            ))}
+                        {todos
+                            .filter((t) => t["state"] === "completed")
+                            .map((todo) => (
+                                <Flex
+                                    key={todo["id"]} align="center" m="2" p="2" paddingX="2" justify="space-between"
+                                    // border={'1px solid gray'} 
+                                    borderRadius={'md'}
+                                    boxShadow={'md'}
+                                >
+                                    <Text as="s" fontWeight={"bold"}>{todo["details"]}</Text>
+                                    <Flex>
+                                        <IconButton
+                                            aria-label="Revive todo"
+                                            icon={<FontAwesomeIcon icon={faRepeat} />}
+                                            onClick={() => handleRevive(todo)}
+                                        />
+                                        <IconButton
+                                            aria-label="Delete todo"
+                                            icon={<FontAwesomeIcon icon={faTrash} />}
+                                            ml="2"
+                                            onClick={() => handleDelete(todo)}
+                                        />
+                                    </Flex>
+                                    {/* <Editable isDisabled defaultValue={todo["data"]} fontWeight={"bold"} >
                                     <EditablePreview />
                                     <EditableInput disabled />
                                 </Editable> */}
-                            </Flex>
-                        ))}
-                </Box>
+                                </Flex>
+                            ))}
+                    </Box>}
             </Box>
         </Center>
     );

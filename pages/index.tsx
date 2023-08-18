@@ -9,7 +9,7 @@ export default function Home() {
     <>
       {/* <LoadPage> */}
         <PomodoroTimer />
-        <Summarizer />
+        {/* <Summarizer /> */}
         <TodoList />
         <Notes />
       {/* </LoadPage> */}
