@@ -23,7 +23,7 @@ type Note = {
 const Notes: React.FC = () => {
     const [notes, setNotes] = useState<Note[]>([]);
     const [input, setInput] = useState<string>("");
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     const { user } = useAuth();
 
