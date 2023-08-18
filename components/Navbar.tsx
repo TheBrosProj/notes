@@ -2,15 +2,21 @@ import { Box, Flex, Avatar, Button, Image, Menu, MenuButton, MenuList, MenuItem,
 import Link from 'next/link';
 import { auth } from '@/lib/firebase';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDownload, faMoon, faPlay, faSun } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthContext';
+import { useEffect } from 'react';
 
 export default function Navbar() {
     const router = useRouter();
     const { colorMode, toggleColorMode } = useColorMode()
     const [isSmallScreen] = useMediaQuery("(max-width: 600px)");
-    const { user } = useAuth(); 
+    const { user } = useAuth();
+    useEffect(() => {
+        if (user) {
+            console.log(user.uid);
+        }
+    }, [user])
     return (
         <Flex as="nav" align="center" justify="space-around" p={4} fontWeight={"extrabold"}>
             <Link href="/">
@@ -18,7 +24,7 @@ export default function Navbar() {
             </Link>
             {isSmallScreen ? (
                 <Menu>
-                    <MenuButton aria-label='menu open button' as={Button} rightIcon={<FontAwesomeIcon icon={faDownload}/>}>
+                    <MenuButton aria-label='menu open button' as={Button} rightIcon={<FontAwesomeIcon icon={faDownload} />}>
                         Menu
                     </MenuButton>
                     <MenuList>

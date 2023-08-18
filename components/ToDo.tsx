@@ -15,10 +15,11 @@ import {
 import { faCheck, faPlus, faRepeat, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import moment from "moment/moment";
+import { useAuth } from "./AuthContext";
 
 interface Todo {
     id: number;
-    data: string;
+    details: string;
     state: "active" | "completed";
     time: number;
 }
@@ -26,78 +27,122 @@ interface Todo {
 const TodoList: React.FC = () => {
     const [todos, setTodos] = useState<Todo[]>([]);
     const [input, setInput] = useState<string>("");
+    const { user } = useAuth();
 
-    // useEffect(() => {
-    //     async function fetchTodos() {
-    //         const response = await fetch('/todo');
-    //         if (response.ok) {
-    //             const todosData: Todo[] = await response.json();
-    //             setTodos(todosData);
-    //         }
-    //     }
+    useEffect(() => {
+        if (user) {
+            fetchTodos();
+        }
+    }, [user]);
 
-    //     fetchTodos();
-    // }, []);
+    const fetchTodos = async () => {
+        try {
+            const response = await fetch(`/api/todo/${user.uid}`);
+
+            if (response.ok) {
+                const todosData = await response.json();
+                setTodos(todosData);
+            } else {
+                console.error("Failed to fetch todos");
+            }
+        } catch (error) {
+            console.error("Error fetching todos", error);
+        }
+    };
 
     const handleAddTodo = async () => {
-        // if (input) {
-        //     const response = await fetch('/todo', {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //         },
-        //         body: JSON.stringify({ data: input }),
-        //     });
+        try {
+            const response = await fetch(`/api/todo/${user.uid}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    details: input,
+                    state: "active",
+                }),
+            });
 
-        //     if (response.ok) {
-                const newTodo : Todo = { id: 1, "data": input, state: "active", time: moment.now() }
+            if (response.ok) {
+                const newTodo = await response.json();
                 setTodos([...todos, newTodo]);
-                setInput('');
-        //     }
-        // }
+                setInput("");
+            } else {
+                console.error("Failed to add todo");
+            }
+        } catch (error) {
+            console.error("Error adding todo", error);
+        }
     };
 
-    const handleDelete = async (todo : Todo) => {
-        // const response = await fetch('/todo', {
-        //     method: 'DELETE',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify({ id: todo.id }),
-        // });
-
-        // if (response.ok) {
-            setTodos([...todos.filter((t) => t.id !== todo.id)]);
-        // }
+    const handleDelete = async (todo: Todo) => {
+        try {
+            const response = await fetch(`/api/todo/${user.uid}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    todo_id: todo.id,
+                }),
+            });
+    
+            if (response.ok) {
+                setTodos([...todos.filter((t) => t.id !== todo.id)]);
+            } else {
+                console.error("Failed to delete todo");
+            }
+        } catch (error) {
+            console.error("Error deleting todo", error);
+        }
     };
-
-    const handleCompletion = async (todo : Todo) => {
-        // const response = await fetch('/todo', {
-        //     method: 'PUT',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify({ id: todo.id, state: 'completed' }),
-        // });
-
-        // if (response.ok) {
-            setTodos([...todos.filter(t => t["data"] !== todo["data"]), { id: todo["id"], data : todo["data"], state: "completed", time: moment.now() }])
-        // }
+    
+    const handleCompletion = async (todo: Todo) => {
+        try {
+            const response = await fetch(`/api/todo/${user.uid}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    todo_id: todo.id,
+                    state: "completed",
+                }),
+            });
+    
+            if (response.ok) {
+                const updatedTodo : Todo = { ...todo, state: "completed" };
+                setTodos([...todos.filter(t => t.id !== todo.id), updatedTodo]);
+            } else {
+                console.error("Failed to complete todo");
+            }
+        } catch (error) {
+            console.error("Error completing todo", error);
+        }
     };
-
-
+    
     const handleRevive = async (todo: Todo) => {
-        // const response = await fetch('/todo', {
-        //     method: 'PUT',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify({ id: todo.id, state: 'active' }),
-        // });
-
-        // if (response.ok) {
-            setTodos([...todos.filter(t => t["data"] !== todo["data"]), { id: todo["id"], data : todo["data"], state: "active", time: moment.now() }])
-        // }
+        try {
+            const response = await fetch(`/api/todo/${user.uid}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    todo_id: todo.id,
+                    state: "active",
+                }),
+            });
+    
+            if (response.ok) {
+                const updatedTodo : Todo = { ...todo, state: "active" };
+                setTodos([...todos.filter(t => t.id !== todo.id), updatedTodo]);
+            } else {
+                console.error("Failed to revive todo");
+            }
+        } catch (error) {
+            console.error("Error reviving todo", error);
+        }
     };
     return (
         <Center>
@@ -139,12 +184,12 @@ const TodoList: React.FC = () => {
                         .filter(todo => todo["state"] === 'active')
                         .map((todo) => (
                             <Flex
-                                key={todo["data"]} align="center" m="2" p="2" justify="space-between"
+                                key={todo["id"]} align="center" m="2" p="2" justify="space-between"
                                 // border={'1px solid gray'} 
                                 borderRadius={'md'}
                                 boxShadow={'md'}
                             >
-                                <Editable defaultValue={todo["data"]} fontWeight={"bold"}>
+                                <Editable defaultValue={todo.details} fontWeight={"bold"}>
                                     <EditablePreview />
                                     <EditableInput />
                                 </Editable>
@@ -167,12 +212,12 @@ const TodoList: React.FC = () => {
                         .filter((t) => t["state"] === "completed")
                         .map((todo) => (
                             <Flex
-                                key={todo["data"]} align="center" m="2" p="2" paddingX="2" justify="space-between"
+                                key={todo["id"]} align="center" m="2" p="2" paddingX="2" justify="space-between"
                                 // border={'1px solid gray'} 
                                 borderRadius={'md'}
                                 boxShadow={'md'}
                             >
-                                <Text as="s" fontWeight={"bold"}>{todo["data"]}</Text>
+                                <Text as="s" fontWeight={"bold"}>{todo["details"]}</Text>
                                 <Flex>
                                     <IconButton
                                         aria-label="Revive todo"

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Box,
     Center,
@@ -11,20 +11,85 @@ import {
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import CustomEditable from "./CustomEditable";
+import { useAuth } from "./AuthContext";
+
+type Note = {
+    id: number;
+    details: string;
+    src: string | null;
+};
 
 const Notes: React.FC = () => {
-    const [notes, setNotes] = useState<string[]>([]);
+    const [notes, setNotes] = useState<Note[]>([]);
     const [input, setInput] = useState<string>("");
+    const { user } = useAuth();
 
-    const handleAddNote = () => {
-        if (input) {
-            setNotes([...notes, input]);
-            setInput("");
+    useEffect(() => {
+        if (user) {
+            fetchNotes();
+        }
+    }, [user]);
+
+    const fetchNotes = async () => {
+        try {
+            const response = await fetch(`/api/note/${user.uid}`);
+
+            if (response.ok) {
+                const notesData = await response.json();
+                setNotes(notesData);
+            } else {
+                console.error("Failed to fetch notes");
+            }
+        } catch (error) {
+            console.error("Error fetching notes", error);
         }
     };
 
-    const handleDeleteNote = (note: string) => {
-        setNotes(notes.filter((t) => t !== note));
+    const handleAddNote = async () => {
+        try {
+            const response = await fetch(`/api/note/${user.uid}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    details: input,
+                    src: "google.com",
+                }),
+            });
+
+            if (response.ok) {
+                const newNote = await response.json();
+                setNotes([...notes, newNote]);
+                setInput("");
+            } else {
+                console.error("Failed to add note");
+            }
+        } catch (error) {
+            console.error("Error adding note", error);
+        }
+    };
+
+    const handleDelete = async (note: Note) => {
+        try {
+            const response = await fetch(`/api/note/${user.uid}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    note_id: note.id,
+                }),
+            });
+
+            if (response.ok) {
+                setNotes([...notes.filter((t) => t.id !== note.id)]);
+            } else {
+                console.error("Failed to delete note");
+            }
+        } catch (error) {
+            console.error("Error deleting note", error);
+        }
     };
 
     return (
@@ -55,11 +120,11 @@ const Notes: React.FC = () => {
                 </InputGroup>
                 <SimpleGrid minChildWidth='xs' spacing='4' p={'2'}>
                     {notes.map((note) => (
-                        <Box key={note} boxShadow={'md'} borderRadius={'md'}>
+                        <Box key={note.id} boxShadow={'md'} borderRadius={'md'}>
                             <CustomEditable
-                                content={note}
+                                content={note.details}
                                 handleDelete={() => {
-                                    handleDeleteNote(note);
+                                    handleDelete(note);
                                 }}
                             />
                         </Box>

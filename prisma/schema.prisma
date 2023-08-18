@@ -10,14 +10,14 @@ datasource db {
 
 model todos {
   id      Int     @id @default(autoincrement())
-  user_id String  @db.Uuid
+  user_id String
   details String?
   state   String?
   users   users   @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model users {
-  user_id     String    @id @db.Uuid
+  user_id     String    @id
   email       String
   last_online DateTime? @db.Timestamptz(6)
   blocklist   String[]
@@ -27,7 +27,7 @@ model users {
 
 model notes {
   id      Int     @id @default(autoincrement())
-  user_id String  @db.Uuid
+  user_id String
   details String?
   src     String?
   users   users   @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)

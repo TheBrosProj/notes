@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useRouter } from 'next/router';
 import {
     Box,
@@ -10,10 +9,12 @@ import {
     useToast
 } from '@chakra-ui/react';
 import { auth } from '@/lib/firebase';
+import { useState } from 'react';
 
 const Signup: React.FC = () => {
     const router = useRouter();
-    const [email, setEmail] = useState('');
+    const [email, setEmail] = useState<string>('');
+    const [uid, setUid] = useState<string>('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const toast = useToast();
@@ -22,8 +23,25 @@ const Signup: React.FC = () => {
         e.preventDefault();
         setIsLoading(true);
         try {
-            await auth.createUserWithEmailAndPassword(email, password);
-            router.push('/'); // Redirect to dashboard on successful signup
+            const res = await auth.createUserWithEmailAndPassword(email, password);
+            
+            if (res.user?.email) {
+                setEmail(res.user.email);
+            }
+            
+            if (res.user?.uid) {
+                setUid(res.user.uid);
+                // Call the API route to create a user using the fetch API
+                await fetch('/api/createUser', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ user: { email, uid: res.user.uid } })
+                });
+            }
+            
+             // Redirect to dashboard on successful signup
         } catch (error) {
             console.log('Signup error:', error);
             toast({
@@ -34,6 +52,7 @@ const Signup: React.FC = () => {
             // Handle signup error
         } finally {
             setIsLoading(false);
+            router.push('/');
         }
     };
 

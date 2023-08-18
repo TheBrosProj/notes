@@ -23,7 +23,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 setUser(null);
             }
         });
-        return () => unsubscribe(); // Cleanup the subscription when the component unmounts
+        return () => unsubscribe();
     }, []);
 
     return (

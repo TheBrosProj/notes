@@ -9,6 +9,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <ChakraProvider>
       <ColorModeScript initialColorMode={"dark"} />
       <AuthProvider>
+        <title>Notes</title>
         <Navbar />
         <Component {...pageProps} />
       </AuthProvider>
