@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model todos {
+  id      Int     @id @default(autoincrement())
+  user_id String  @db.Uuid
+  details String?
+  state   String?
+  users   users   @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model users {
+  user_id     String    @id @db.Uuid
+  email       String
+  last_online DateTime? @db.Timestamptz(6)
+  blocklist   String[]
+  notes       notes[]
+  todos       todos[]
+}
+
+model notes {
+  id      Int     @id @default(autoincrement())
+  user_id String  @db.Uuid
+  details String?
+  src     String?
+  users   users   @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+}
