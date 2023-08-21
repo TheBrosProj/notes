@@ -27,7 +27,7 @@ interface Todo {
 const TodoList: React.FC = () => {
     const [todos, setTodos] = useState<Todo[]>([]);
     const [input, setInput] = useState<string>("");
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     const { user } = useAuth();
 
     useEffect(() => {
@@ -183,15 +183,15 @@ const TodoList: React.FC = () => {
                 </InputGroup>
                 {isLoading ?
                     <>
-                        <Skeleton m={'2'}>
+                        <Skeleton m={'2'} boxShadow={'md'} borderRadius={'2xl'}>
                             <div>please wait while we load todos</div>
                             <div>please wait while we load todos</div>
                         </Skeleton>
-                        <Skeleton m={'2'}>
+                        <Skeleton m={'2'} boxShadow={'md'} borderRadius={'2xl'}>
                             <div>please wait while we load todos</div>
                             <div>please wait while we load todos</div>
                         </Skeleton>
-                        <Skeleton m={'2'}>
+                        <Skeleton m={'2'} boxShadow={'md'} borderRadius={'2xl'}>
                             <div>please wait while we load todos</div>
                             <div>please wait while we load todos</div>
                         </Skeleton>

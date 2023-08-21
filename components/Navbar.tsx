@@ -29,12 +29,12 @@ export default function Navbar() {
                     </MenuButton>
                     <MenuList>
                         <MenuItem aria-label='home' onClick={() => router.push("/")}>Home</MenuItem>
-                        <MenuItem aria-label='profile' onClick={() => router.push("/profile")}>Profile</MenuItem>
                         <MenuItem aria-label='about' onClick={() => router.push("/about")}>About</MenuItem>
+                        <MenuItem aria-label='beta' onClick={() => router.push("/beta")}>Beta</MenuItem>
                         {user ? (
                             <>
                                 <MenuItem aria-label='profile' onClick={() => router.push("/profile")}>Account</MenuItem>
-                                <MenuItem aria-label='log out' onClick={() => router.push("/logout")}>Log Out</MenuItem>
+                                <MenuItem aria-label='log out' onClick={() => auth.signOut()}>Log Out</MenuItem>
                             </>
                         ) : (
                             <>
@@ -49,7 +49,7 @@ export default function Navbar() {
                 <>
                     <Link aria-label='home' href="/">Home</Link>
                     <Link aria-label='about' href="/about">About</Link>
-                    <Link aria-label='profile' href="/profile">Profile</Link>
+                    <Link aria-label='beta' href="/beta">Beta</Link>
                 </>
             )}
             <IconButton m={'1'} aria-label='toggle color theme' onClick={toggleColorMode} icon={<FontAwesomeIcon icon={colorMode === 'light' ? faMoon : faSun} />}>

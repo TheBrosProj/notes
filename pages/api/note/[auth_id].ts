@@ -37,6 +37,24 @@ export default async function handler(
       console.error('Error adding note', error);
       res.status(500).end();
     }
+  } else if (req.method === 'PUT') {
+    const { note_id, details, src } = req.body;
+    try {
+      const updatedNote = await prisma.notes.update({
+        where: {
+          id: parseInt(note_id as string),
+        },
+        data: {
+          details,
+          src,
+        },
+      });
+
+      res.status(200).json(updatedNote);
+    } catch (error) {
+      console.error('Error updating note', error);
+      res.status(500).end();
+    }
   } else if (req.method === 'DELETE') {
     const { note_id } = req.body;
     try {

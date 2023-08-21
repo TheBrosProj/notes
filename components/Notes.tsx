@@ -2,6 +2,10 @@ import React, { useEffect, useState } from "react";
 import {
     Box,
     Center,
+    Editable,
+    EditableInput,
+    EditablePreview,
+    Flex,
     IconButton,
     Input,
     InputGroup,
@@ -9,9 +13,8 @@ import {
     SimpleGrid,
     Skeleton,
 } from "@chakra-ui/react";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import CustomEditable from "./CustomEditable";
 import { useAuth } from "./AuthContext";
 
 type Note = {
@@ -23,7 +26,7 @@ type Note = {
 const Notes: React.FC = () => {
     const [notes, setNotes] = useState<Note[]>([]);
     const [input, setInput] = useState<string>("");
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const { user } = useAuth();
 
@@ -96,6 +99,33 @@ const Notes: React.FC = () => {
             console.error("Error deleting note", error);
         }
     };
+    const handleUpdateNote = async (note: Note) => {
+        try {
+          const response = await fetch(`/api/note/${user.uid}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              note_id: note.id,
+              details: note.details, // updated details
+              src: note.src, // updated src
+            }),
+          });
+    
+          if (response.ok) {
+            const updatedNote = await response.json();
+            const updatedNotes = notes.map((n) =>
+              n.id === updatedNote.id ? updatedNote : n
+            );
+            setNotes(updatedNotes);
+          } else {
+            console.error('Failed to update note');
+          }
+        } catch (error) {
+          console.error('Error updating note', error);
+        }
+      };
 
     return (
         <Center>
@@ -123,40 +153,48 @@ const Notes: React.FC = () => {
                         />
                     </InputRightElement>
                 </InputGroup>
-                { isLoading ?
+                {isLoading ?
                     <>
-                    <SimpleGrid minChildWidth='xs' spacing='4' p={'2'}>
-                        <Skeleton boxShadow={'md'} borderRadius={'md'}>
-                            <div>please wait while we load todos</div>
-                            <div>please wait while we load todos</div>
-                            <div>please wait while we load todos</div>
-                        </Skeleton>
-                        <Skeleton  boxShadow={'md'} borderRadius={'md'}>
-                            <div>please wait while we load todos</div>
-                            <div>please wait while we load todos</div>
-                            <div>please wait while we load todos</div>
-                        </Skeleton>
-                        <Skeleton  boxShadow={'md'} borderRadius={'md'}>
-                            <div>please wait while we load todos</div>
-                            <div>please wait while we load todos</div>
-                            <div>please wait while we load todos</div>
-                        </Skeleton>
-                        <Skeleton  boxShadow={'md'} borderRadius={'md'}>
-                            <div>please wait while we load todos</div>
-                            <div>please wait while we load todos</div>
-                            <div>please wait while we load todos</div>
-                        </Skeleton>
+                        <SimpleGrid minChildWidth='xs' spacing='3' p={'2'}>
+                            <Skeleton boxShadow={'md'} borderRadius={'2xl'}>
+                                <div>please wait while we load notes</div>
+                                <div>please wait while we load notes</div>
+                                <div>please wait while we load notes</div>
+                            </Skeleton>
+                            <Skeleton boxShadow={'md'} borderRadius={'2xl'}>
+                                <div>please wait while we load notes</div>
+                                <div>please wait while we load notes</div>
+                                <div>please wait while we load notes</div>
+                            </Skeleton>
+                            <Skeleton boxShadow={'md'} borderRadius={'2xl'}>
+                                <div>please wait while we load notes</div>
+                                <div>please wait while we load notes</div>
+                                <div>please wait while we load notes</div>
+                            </Skeleton>
+                            <Skeleton boxShadow={'md'} borderRadius={'2xl'}>
+                                <div>please wait while we load notes</div>
+                                <div>please wait while we load notes</div>
+                                <div>please wait while we load notes</div>
+                            </Skeleton>
                         </SimpleGrid>
                     </> :
                     <SimpleGrid minChildWidth='xs' spacing='4' p={'2'}>
                         {notes.map((note) => (
                             <Box key={note.id} boxShadow={'md'} borderRadius={'md'}>
-                                <CustomEditable
-                                    content={note.details}
-                                    handleDelete={() => {
-                                        handleDelete(note);
-                                    }}
-                                />
+                                <Flex key={note.details} align="center" m="2" justify="space-between">
+                                    <Editable fontSize='md' defaultValue={note.details} isTruncated onSubmit={(value) => handleUpdateNote({ ...note, details: value })}>
+                                        <EditablePreview />
+                                        <EditableInput />
+                                    </Editable>
+                                    <Flex>
+                                        <IconButton
+                                            aria-label="Delete todo"
+                                            icon={<FontAwesomeIcon icon={faTrash} />}
+                                            ml="2"
+                                            onClick={() => handleDelete(note)}
+                                        />
+                                    </Flex>
+                                </Flex>
                             </Box>
                         ))}
                     </SimpleGrid>}
