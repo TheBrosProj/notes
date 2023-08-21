@@ -1,6 +1,6 @@
 import Summarizer from "@/components/Summarizer";
 
-function summarizer(){
+export default function summarizer(){
     return (
         <>
         <Summarizer/>
