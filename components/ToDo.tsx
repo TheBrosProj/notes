@@ -12,10 +12,12 @@ import {
     InputGroup,
     InputRightElement,
     Skeleton,
+    useToast
 } from "@chakra-ui/react";
 import { faCheck, faPlus, faRepeat, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAuth } from "./AuthContext";
+import Cookies from 'js-cookie';
 
 interface Todo {
     id: number;
@@ -28,13 +30,28 @@ const TodoList: React.FC = () => {
     const [todos, setTodos] = useState<Todo[]>([]);
     const [input, setInput] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const toast = useToast();
     const { user } = useAuth();
 
     useEffect(() => {
         if (user) {
             fetchTodos();
+        } else {
+            getCookies();
         }
     }, [user]);
+
+    const setCookies = (todoArray: Todo[]) => {
+        Cookies.set('todos', JSON.stringify(todoArray));
+    };
+
+    const getCookies = () => {
+        const CookieTodos: string | undefined = Cookies.get('todos');
+        if (CookieTodos) {
+            setTodos(JSON.parse(CookieTodos) as Todo[]);
+            setIsLoading(false);
+        }
+    };
 
     const fetchTodos = async () => {
         try {
@@ -43,15 +60,26 @@ const TodoList: React.FC = () => {
             if (response.ok) {
                 const todosData = await response.json();
                 setTodos(todosData);
+                setCookies(todosData);
             } else {
-                console.error("Failed to fetch todos");
+                handleError();
             }
         } catch (error) {
-            console.error("Error fetching todos", error);
+            handleError();
         } finally {
             setIsLoading(false);
         }
     };
+
+    const handleError = () => {
+        toast({
+            title: 'Error',
+            description: "Could not complete action, try again",
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+        })
+    }
 
     const handleAddTodo = async () => {
         try {
@@ -71,14 +99,15 @@ const TodoList: React.FC = () => {
                 setTodos([...todos, newTodo]);
                 setInput("");
             } else {
-                console.error("Failed to add todo");
+                handleError();
             }
         } catch (error) {
-            console.error("Error adding todo", error);
+            handleError();
         }
     };
 
     const handleDelete = async (todo: Todo) => {
+        setTodos(prev => [...prev.filter((t) => t.id !== todo.id)]);
         try {
             const response = await fetch(`/api/todo/${user.uid}`, {
                 method: "DELETE",
@@ -89,18 +118,21 @@ const TodoList: React.FC = () => {
                     todo_id: todo.id,
                 }),
             });
-
             if (response.ok) {
-                setTodos([...todos.filter((t) => t.id !== todo.id)]);
-            } else {
-                console.error("Failed to delete todo");
+                setCookies([...todos.filter((t) => t.id !== todo.id)]);
+            }else{
+                handleError();
+                getCookies();
             }
         } catch (error) {
-            console.error("Error deleting todo", error);
+            handleError();
+            getCookies();
         }
     };
 
     const handleCompletion = async (todo: Todo) => {
+        const updatedTodo: Todo = { ...todo, state: "completed" };
+        setTodos([...todos.filter(t => t.id !== todo.id), updatedTodo]);
         try {
             const response = await fetch(`/api/todo/${user.uid}`, {
                 method: "PUT",
@@ -114,17 +146,20 @@ const TodoList: React.FC = () => {
             });
 
             if (response.ok) {
-                const updatedTodo: Todo = { ...todo, state: "completed" };
-                setTodos([...todos.filter(t => t.id !== todo.id), updatedTodo]);
+                setCookies([...todos.filter(t => t.id !== todo.id), updatedTodo]);
             } else {
-                console.error("Failed to complete todo");
+                handleError();
+                getCookies();
             }
         } catch (error) {
-            console.error("Error completing todo", error);
+            handleError();
+            getCookies();
         }
     };
 
     const handleRevive = async (todo: Todo) => {
+        const updatedTodo: Todo = { ...todo, state: "active" };
+        setTodos([...todos.filter(t => t.id !== todo.id), updatedTodo]);
         try {
             const response = await fetch(`/api/todo/${user.uid}`, {
                 method: "PUT",
@@ -138,13 +173,14 @@ const TodoList: React.FC = () => {
             });
 
             if (response.ok) {
-                const updatedTodo: Todo = { ...todo, state: "active" };
-                setTodos([...todos.filter(t => t.id !== todo.id), updatedTodo]);
+                setCookies([...todos.filter(t => t.id !== todo.id), updatedTodo]);
             } else {
-                console.error("Failed to revive todo");
+                handleError();
+                getCookies();
             }
         } catch (error) {
-            console.error("Error reviving todo", error);
+            handleError();
+            getCookies();
         }
     };
     return (

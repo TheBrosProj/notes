@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import {
     Box,
     Center,
@@ -12,10 +13,12 @@ import {
     InputRightElement,
     SimpleGrid,
     Skeleton,
+    useToast
 } from "@chakra-ui/react";
-import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faLink, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAuth } from "./AuthContext";
+import Cookies from 'js-cookie';
 
 type Note = {
     id: number;
@@ -27,14 +30,37 @@ const Notes: React.FC = () => {
     const [notes, setNotes] = useState<Note[]>([]);
     const [input, setInput] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(true);
-
+    const toast = useToast();
+    const router = useRouter();
     const { user } = useAuth();
 
     useEffect(() => {
         if (user) {
             fetchNotes();
         }
+        else {
+            getCookies();
+        }
     }, [user]);
+
+    const setCookies = (noteArray: Note[]) => {
+        Cookies.set('notes', JSON.stringify(noteArray));
+    };
+
+    const getCookies = () => {
+        const CookieNotes: string | undefined = Cookies.get('notes');
+        if (CookieNotes) {
+            setNotes(JSON.parse(CookieNotes) as Note[]);
+            setIsLoading(false);
+        }
+        toast({
+            title: 'Loaded Notes',
+            description: "Loaded notes from cookies",
+            status: 'success',
+            duration: 3000,
+            isClosable: true,
+        })
+    };
 
     const fetchNotes = async () => {
         try {
@@ -43,6 +69,8 @@ const Notes: React.FC = () => {
             if (response.ok) {
                 const notesData = await response.json();
                 setNotes(notesData);
+                setCookies(notesData);
+                console.log("cookies set");
             } else {
                 console.error("Failed to fetch notes");
             }
@@ -53,6 +81,16 @@ const Notes: React.FC = () => {
         }
     };
 
+    const handleError = () => {
+        toast({
+            title: 'Error',
+            description: "Could not complete action, try again",
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+        })
+    }
+
     const handleAddNote = async () => {
         try {
             const response = await fetch(`/api/note/${user.uid}`, {
@@ -62,7 +100,7 @@ const Notes: React.FC = () => {
                 },
                 body: JSON.stringify({
                     details: input,
-                    src: "google.com",
+                    src: null,
                 }),
             });
 
@@ -71,14 +109,15 @@ const Notes: React.FC = () => {
                 setNotes([...notes, newNote]);
                 setInput("");
             } else {
-                console.error("Failed to add note");
+                handleError();
             }
         } catch (error) {
-            console.error("Error adding note", error);
+            handleError();
         }
     };
 
     const handleDelete = async (note: Note) => {
+        setNotes(prev => [...prev.filter((t) => t.id !== note.id)]);
         try {
             const response = await fetch(`/api/note/${user.uid}`, {
                 method: "DELETE",
@@ -89,43 +128,44 @@ const Notes: React.FC = () => {
                     note_id: note.id,
                 }),
             });
-
             if (response.ok) {
-                setNotes([...notes.filter((t) => t.id !== note.id)]);
+                setCookies([...notes.filter((t) => t.id !== note.id)]);
             } else {
-                console.error("Failed to delete note");
+                handleError();
+                getCookies();
             }
         } catch (error) {
-            console.error("Error deleting note", error);
+            handleError();
+            getCookies();
         }
     };
     const handleUpdateNote = async (note: Note) => {
         try {
-          const response = await fetch(`/api/note/${user.uid}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              note_id: note.id,
-              details: note.details, // updated details
-              src: note.src, // updated src
-            }),
-          });
-    
-          if (response.ok) {
-            const updatedNote = await response.json();
-            const updatedNotes = notes.map((n) =>
-              n.id === updatedNote.id ? updatedNote : n
-            );
-            setNotes(updatedNotes);
-          } else {
-            console.error('Failed to update note');
-          }
+            const response = await fetch(`/api/note/${user.uid}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    note_id: note.id,
+                    details: note.details,
+                    src: note.src,
+                }),
+            });
+
+            if (response.ok) {
+                const updatedNote = await response.json();
+                const updatedNotes = notes.map((n) =>
+                    n.id === updatedNote.id ? updatedNote : n
+                );
+                setNotes(updatedNotes);
+            } else {
+                handleError();
+            }
         } catch (error) {
-          console.error('Error updating note', error);
+            handleError();
         }
-      };
+    };
 
     return (
         <Center>
@@ -187,8 +227,16 @@ const Notes: React.FC = () => {
                                         <EditableInput />
                                     </Editable>
                                     <Flex>
+                                        {note.src != null &&
+                                            <IconButton
+                                                aria-label="Go to source"
+                                                icon={<FontAwesomeIcon icon={faLink} />}
+                                                ml="2"
+                                                onClick={() => { router.push(`${note.src}`) }}
+                                            />
+                                        }
                                         <IconButton
-                                            aria-label="Delete todo"
+                                            aria-label="Delete Note"
                                             icon={<FontAwesomeIcon icon={faTrash} />}
                                             ml="2"
                                             onClick={() => handleDelete(note)}
