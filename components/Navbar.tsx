@@ -2,7 +2,7 @@ import { Box, Flex, Avatar, Button, Image, Menu, MenuButton, MenuList, MenuItem,
 import Link from 'next/link';
 import { auth } from '@/lib/firebase';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleDown, faDownload, faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
+import { faAngleDown, faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthContext';
 import { useEffect } from 'react';
@@ -34,7 +34,7 @@ export default function Navbar() {
                         {user ? (
                             <>
                                 <MenuItem aria-label='profile' onClick={() => router.push("/profile")}>Account</MenuItem>
-                                <MenuItem aria-label='log out' onClick={() => auth.signOut()}>Log Out</MenuItem>
+                                <MenuItem aria-label='log out' onClick={() => {auth.signOut();router.push("/");}}>Log Out</MenuItem>
                             </>
                         ) : (
                             <>

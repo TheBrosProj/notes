@@ -5,8 +5,10 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  // auth_id is used as query instead of body for convience in our other projects
+  // where showing we might not even use body for apis. 
   const { auth_id } = req.query;
-
+  // get notes
   if (req.method === 'GET') {
     try {
       const notes = await prisma.notes.findMany({
@@ -20,7 +22,9 @@ export default async function handler(
       console.error('Error fetching notes', error);
       res.status(500).end();
     }
-  } else if (req.method === 'POST') {
+  }
+  // add new note
+  else if (req.method === 'POST') {
     const { details, src } = req.body;
     try {
       const newNote = await prisma.notes.create({
@@ -36,7 +40,9 @@ export default async function handler(
       console.error('Error adding note', error);
       res.status(500).end();
     }
-  } else if (req.method === 'PUT') {
+  }
+  // update note
+  else if (req.method === 'PUT') {
     const { note_id, details, src } = req.body;
     try {
       const updatedNote = await prisma.notes.update({
@@ -54,7 +60,9 @@ export default async function handler(
       console.error('Error updating note', error);
       res.status(500).end();
     }
-  } else if (req.method === 'DELETE') {
+  }
+  // delete note
+  else if (req.method === 'DELETE') {
     const { note_id } = req.body;
     try {
       await prisma.notes.delete({
@@ -68,7 +76,9 @@ export default async function handler(
       console.error('Error deleting note', error);
       res.status(500).end();
     }
-  } else {
+  }
+  // bad request
+  else {
     res.status(405).end();
   }
 }

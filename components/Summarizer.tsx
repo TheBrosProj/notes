@@ -1,3 +1,10 @@
+/**
+ * Summarize content using llms
+ * from youtube video, article or a document
+ * might be implemented to release
+ * but in bet right now
+ */
+
 import React, { useState } from "react";
 import {
     Box,

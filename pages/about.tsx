@@ -1,5 +1,6 @@
 import { Box, Text } from '@chakra-ui/react';
 
+// TODO: add relevant team information and contact info
 
 export default function Home() {
     return (

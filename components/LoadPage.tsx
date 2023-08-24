@@ -1,3 +1,8 @@
+/**
+ * loading animation under construction
+ * this is just a prototype to check if dom is loaded
+ */
+
 import React, { useState, useEffect } from 'react';
 import { Center, Spinner, Text, Box, DarkMode, FlexProps } from '@chakra-ui/react';
 

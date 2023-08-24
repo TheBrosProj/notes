@@ -1,3 +1,10 @@
+/** 
+ * Not using this rn but plan to implement
+ * connection manager so app works offline
+ * as a pwa without any internet access
+ */
+
+
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 interface AppContextType {
     connection: 'online' | 'offline',

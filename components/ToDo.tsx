@@ -1,3 +1,12 @@
+/**
+ * Todos : 
+ * This is store what you need to do
+ * consists of id, details, state, time
+ * time is not being used right now
+ * but it will be used for notifications
+ * and importances in future
+ */
+
 import React, { useEffect, useState } from "react";
 import {
     Text,
@@ -18,7 +27,6 @@ import {
 import { faCheck, faPlus, faRepeat, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAuth } from "./AuthContext";
-import Cookies from 'js-cookie';
 import { getCookies, setCookies } from "@/lib/cookies";
 
 interface Todo {
@@ -36,36 +44,12 @@ const TodoList: React.FC = () => {
     const { user } = useAuth();
 
     useEffect(() => {
+        setTodos(JSON.parse(getCookies('todos')) as Todo[]);
+        setIsLoading(false);
         if (user) {
             fetchTodos();
-        } else {
-            setTodos(JSON.parse(getCookies('todos')) as Todo[]);
-            setIsLoading(false);
         }
     }, [user]);
-
-    // useEffect(() => {
-    //     const down = (e: KeyboardEvent) => {
-    //         if (e.key === "Enter") {
-    //             e.preventDefault();
-    //             handleAddTodo();
-    //         }
-    //     }
-    //     document.addEventListener("keydown", down)
-    //     return () => document.removeEventListener("keydown", down)
-    // }, [])
-
-    // const setCookies = (todoArray: Todo[]) => {
-    //     Cookies.set('todos', JSON.stringify(todoArray));
-    // };
-
-    // const getCookies = () => {
-    //     const CookieTodos: string | undefined = Cookies.get('todos');
-    //     if (CookieTodos) {
-    //         setTodos(JSON.parse(CookieTodos) as Todo[]);
-    //         setIsLoading(false);
-    //     }
-    // };
 
     const fetchTodos = async () => {
         try {
@@ -76,10 +60,10 @@ const TodoList: React.FC = () => {
                 setTodos(todosData);
                 setCookies('todos', todosData);
             } else {
-                handleError();
+                handleError("failed to reach database");
             }
         } catch (error) {
-            handleError();
+            handleError("failed to fetch todos");
         } finally {
             setIsLoading(false);
         }
@@ -114,7 +98,7 @@ const TodoList: React.FC = () => {
                     setTodos([...todos, newTodo]);
                     setInput("");
                 } else {
-                    handleError();
+                    handleError("failed to reach database");
                 }
             } catch (error) {
                 handleError();
@@ -137,7 +121,7 @@ const TodoList: React.FC = () => {
             if (response.ok) {
                 setCookies('todos', [...todos.filter((t) => t.id !== todo.id)]);
             } else {
-                handleError();
+                handleError("failed to reach database");
                 setTodos(JSON.parse(getCookies('todos')) as Todo[]);
             }
         } catch (error) {
@@ -164,7 +148,7 @@ const TodoList: React.FC = () => {
             if (response.ok) {
                 setCookies('todos', [...todos.filter(t => t.id !== todo.id), updatedTodo]);
             } else {
-                handleError();
+                handleError("failed to reach database");
                 setTodos(JSON.parse(getCookies('todos')) as Todo[]);
             }
         } catch (error) {
@@ -191,7 +175,7 @@ const TodoList: React.FC = () => {
             if (response.ok) {
                 setCookies('todos', [...todos.filter(t => t.id !== todo.id), updatedTodo]);
             } else {
-                handleError();
+                handleError("failed to reach database");
                 setTodos(JSON.parse(getCookies('todos')) as Todo[]);
             }
         } catch (error) {
@@ -283,31 +267,31 @@ const TodoList: React.FC = () => {
                             .filter((t) => t.state === "completed")
                             .map((todo) => (
                                 <SlideFade key={todo.id} in={true}>
-                                <Flex
-                                    key={todo.id} align="center" m="2" p="2" paddingX="2" justify="space-between"
-                                    // border={'1px solid gray'} 
-                                    borderRadius={'md'}
-                                    boxShadow={'md'}
-                                >
-                                    <Text as="s" fontWeight={"bold"}>{todo.details}</Text>
-                                    <Flex>
-                                        <IconButton
-                                            aria-label="Revive todo"
-                                            icon={<FontAwesomeIcon icon={faRepeat} />}
-                                            onClick={() => handleRevive(todo)}
-                                        />
-                                        <IconButton
-                                            aria-label="Delete todo"
-                                            icon={<FontAwesomeIcon icon={faTrash} />}
-                                            ml="2"
-                                            onClick={() => handleDelete(todo)}
-                                        />
-                                    </Flex>
-                                    {/* <Editable isDisabled defaultValue={todo.data} fontWeight={"bold"} >
+                                    <Flex
+                                        key={todo.id} align="center" m="2" p="2" paddingX="2" justify="space-between"
+                                        // border={'1px solid gray'} 
+                                        borderRadius={'md'}
+                                        boxShadow={'md'}
+                                    >
+                                        <Text as="s" fontWeight={"bold"}>{todo.details}</Text>
+                                        <Flex>
+                                            <IconButton
+                                                aria-label="Revive todo"
+                                                icon={<FontAwesomeIcon icon={faRepeat} />}
+                                                onClick={() => handleRevive(todo)}
+                                            />
+                                            <IconButton
+                                                aria-label="Delete todo"
+                                                icon={<FontAwesomeIcon icon={faTrash} />}
+                                                ml="2"
+                                                onClick={() => handleDelete(todo)}
+                                            />
+                                        </Flex>
+                                        {/* <Editable isDisabled defaultValue={todo.data} fontWeight={"bold"} >
                                     <EditablePreview />
                                     <EditableInput disabled />
                                 </Editable> */}
-                                </Flex>
+                                    </Flex>
                                 </SlideFade>
                             ))}
                     </Box>}

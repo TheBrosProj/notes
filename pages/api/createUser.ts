@@ -8,6 +8,8 @@ type NextApiRequestWithUser = NextApiRequest & {
   };
 };
 
+// create user entry in database
+
 const createUserHandler = async (
   req: NextApiRequestWithUser,
   res: NextApiResponse

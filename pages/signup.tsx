@@ -1,3 +1,8 @@
+/**
+ * Nothing to explain just another boring login
+ * TODO: update last_online in database upon login
+ */
+
 import { useRouter } from 'next/router';
 import {
     Box,

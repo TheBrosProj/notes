@@ -1,3 +1,9 @@
+/**
+ * Just a profile page to show Mail, Name and other boring stuff
+ * We cant update user specific details as auth. is handled by firebase
+ * will be shifting to using database for user details when needed
+ */
+
 import { Box, Heading, Text } from '@chakra-ui/react';
 import { useAuth } from '@/components/AuthContext';
 import { Image } from '@chakra-ui/react';

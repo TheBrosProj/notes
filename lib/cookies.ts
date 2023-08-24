@@ -1,3 +1,7 @@
+/**
+ * we dont use cookies except for convenience of storing cache and theme information
+ */
+
 import Cookies from "js-cookie";
 
 export const CookieConsent = (Cookies.get('cookies')!== "deny" && Cookies.get('cookies')==="allow" ) ? true : false;

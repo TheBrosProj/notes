@@ -1,3 +1,10 @@
+/**
+ * Notes : 
+ * each not have details and src(optional)
+ * this is to store info and its origin to
+ * quickly refer when needed
+ */
+
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
@@ -19,7 +26,6 @@ import {
 import { faLink, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAuth } from "./AuthContext";
-import Cookies from 'js-cookie';
 import { getCookies, setCookies } from "@/lib/cookies";
 
 type Note = {
@@ -40,24 +46,11 @@ const Notes: React.FC = () => {
 
     useEffect(() => {
         if (user) {
-            fetchNotes();
-        }
-        else {
             setNotes(JSON.parse(getCookies('notes')) as Note[]);
             setIsLoading(false);
+            fetchNotes();
         }
     }, [user]);
-
-    // useEffect(() => {
-    //     const down = (e: KeyboardEvent) => {
-    //         if (e.key === "Enter") {
-    //             e.preventDefault();
-    //             handleAddNote();
-    //         }
-    //     }
-    //     document.addEventListener("keydown", down)
-    //     return () => document.removeEventListener("keydown", down)
-    // }, [])
 
     const fetchNotes = async () => {
         try {
@@ -66,12 +59,12 @@ const Notes: React.FC = () => {
             if (response.ok) {
                 const notesData = await response.json();
                 setNotes(notesData);
-                setCookies('notes',notesData);
+                setCookies('notes', notesData);
             } else {
-                console.error("Failed to fetch notes");
+                handleError("failed to reach database");
             }
         } catch (error) {
-            console.error("Error fetching notes", error);
+            handleError("failed to fetch notes");
         } finally {
             setIsLoading(false);
         }
@@ -105,7 +98,7 @@ const Notes: React.FC = () => {
                 setNotes([...notes, newNote]);
                 setInput("");
             } else {
-                handleError();
+                handleError("failed to reach database");
             }
         } catch (error) {
             handleError();
@@ -125,9 +118,9 @@ const Notes: React.FC = () => {
                 }),
             });
             if (response.ok) {
-                setCookies('notes',[...notes.filter((t) => t.id !== note.id)]);
+                setCookies('notes', [...notes.filter((t) => t.id !== note.id)]);
             } else {
-                handleError();
+                handleError("failed to reach database");
                 setNotes(JSON.parse(getCookies('notes')) as Note[]);
             }
         } catch (error) {
@@ -156,7 +149,7 @@ const Notes: React.FC = () => {
                 );
                 setNotes(updatedNotes);
             } else {
-                handleError();
+                handleError("failed to reach database");
             }
         } catch (error) {
             handleError();

@@ -5,8 +5,10 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  // auth_id is used as query instead of body for convience in our other projects
+  // where showing we might not even use body for apis. 
   const { auth_id } = req.query;
-  
+// get todos
   if (req.method === 'GET') {
     try {
       const todos = await prisma.todos.findMany({
@@ -14,13 +16,15 @@ export default async function handler(
           user_id: auth_id as string,
         },
       });
-  
+
       res.status(200).json(todos);
     } catch (error) {
       console.error('Error fetching todos', error);
       res.status(500).end();
     }
-  } else if (req.method === 'POST') {
+  } 
+  // create todo
+  else if (req.method === 'POST') {
     const { details, state } = req.body;
     try {
       const newTodo = await prisma.todos.create({
@@ -30,13 +34,15 @@ export default async function handler(
           state,
         },
       });
-  
+
       res.status(201).json(newTodo);
     } catch (error) {
       console.error('Error adding todo', error);
       res.status(500).end();
     }
-  } else if (req.method === 'DELETE') {
+  }
+  // delete todo
+  else if (req.method === 'DELETE') {
     const { todo_id } = req.body;
     try {
       await prisma.todos.delete({
@@ -50,7 +56,9 @@ export default async function handler(
       console.error('Error deleting todo', error);
       res.status(500).end();
     }
-  } else if (req.method === 'PUT') {
+  } 
+  // update todo state
+  else if (req.method === 'PUT') {
     const { todo_id, state } = req.body;
     try {
       const updatedTodo = await prisma.todos.update({
@@ -67,7 +75,9 @@ export default async function handler(
       console.error('Error updating todo', error);
       res.status(500).end();
     }
-  } else {
+  }
+  // bad request
+  else {
     res.status(405).end();
   }
 }

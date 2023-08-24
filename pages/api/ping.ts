@@ -1,4 +1,5 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+// This is present for illustration 
+// and might be used to check for active internet connection
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 type Data = {

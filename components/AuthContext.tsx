@@ -1,3 +1,7 @@
+/**
+ * where components get user variable for uuid , email and all
+*/
+
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { auth } from '@/lib/firebase';
 

@@ -1,3 +1,10 @@
+/**
+ * We use prisma as our sql oem
+ * dont ever initialize another PrismaClient
+ * use this or preferably use Cookies (with consent) for temps
+ */
+
+
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -18,5 +25,7 @@ export const createUser = async (email: string, uid: string) => {
         throw error;
     }
 };
+
+// TODO: add function to update last_online on every logins 
 
 export default prisma;
