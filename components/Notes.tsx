@@ -81,6 +81,10 @@ const Notes: React.FC = () => {
     }
 
     const handleAddNote = async () => {
+        if(user === null){
+            handleError("Log in to use Notes","you must sign in to store your notes in the database.")
+            return;
+        }
         try {
             const response = await fetch(`/api/note/${user.uid}`, {
                 method: "POST",

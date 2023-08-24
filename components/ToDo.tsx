@@ -80,6 +80,10 @@ const TodoList: React.FC = () => {
     }
 
     const handleAddTodo = async () => {
+        if(user === null){
+            handleError("Log in to use Todo","you must sign in to store your todos in the database.")
+            return;
+        }
         if (input) {
             try {
                 const response = await fetch(`/api/todo/${user.uid}`, {
