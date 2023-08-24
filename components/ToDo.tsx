@@ -12,12 +12,14 @@ import {
     InputGroup,
     InputRightElement,
     Skeleton,
-    useToast
+    useToast,
+    SlideFade
 } from "@chakra-ui/react";
 import { faCheck, faPlus, faRepeat, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAuth } from "./AuthContext";
 import Cookies from 'js-cookie';
+import { getCookies, setCookies } from "@/lib/cookies";
 
 interface Todo {
     id: number;
@@ -37,21 +39,33 @@ const TodoList: React.FC = () => {
         if (user) {
             fetchTodos();
         } else {
-            getCookies();
+            setTodos(JSON.parse(getCookies('todos')) as Todo[]);
+            setIsLoading(false);
         }
     }, [user]);
 
-    const setCookies = (todoArray: Todo[]) => {
-        Cookies.set('todos', JSON.stringify(todoArray));
-    };
+    // useEffect(() => {
+    //     const down = (e: KeyboardEvent) => {
+    //         if (e.key === "Enter") {
+    //             e.preventDefault();
+    //             handleAddTodo();
+    //         }
+    //     }
+    //     document.addEventListener("keydown", down)
+    //     return () => document.removeEventListener("keydown", down)
+    // }, [])
 
-    const getCookies = () => {
-        const CookieTodos: string | undefined = Cookies.get('todos');
-        if (CookieTodos) {
-            setTodos(JSON.parse(CookieTodos) as Todo[]);
-            setIsLoading(false);
-        }
-    };
+    // const setCookies = (todoArray: Todo[]) => {
+    //     Cookies.set('todos', JSON.stringify(todoArray));
+    // };
+
+    // const getCookies = () => {
+    //     const CookieTodos: string | undefined = Cookies.get('todos');
+    //     if (CookieTodos) {
+    //         setTodos(JSON.parse(CookieTodos) as Todo[]);
+    //         setIsLoading(false);
+    //     }
+    // };
 
     const fetchTodos = async () => {
         try {
@@ -60,7 +74,7 @@ const TodoList: React.FC = () => {
             if (response.ok) {
                 const todosData = await response.json();
                 setTodos(todosData);
-                setCookies(todosData);
+                setCookies('todos', todosData);
             } else {
                 handleError();
             }
@@ -71,10 +85,10 @@ const TodoList: React.FC = () => {
         }
     };
 
-    const handleError = () => {
+    const handleError = (title?: string, reason?: string) => {
         toast({
-            title: 'Error',
-            description: "Could not complete action, try again",
+            title: title ? title : 'Error',
+            description: reason ? reason : 'Could not complete action, try again',
             status: 'error',
             duration: 3000,
             isClosable: true,
@@ -82,27 +96,29 @@ const TodoList: React.FC = () => {
     }
 
     const handleAddTodo = async () => {
-        try {
-            const response = await fetch(`/api/todo/${user.uid}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    details: input,
-                    state: "active",
-                }),
-            });
+        if (input) {
+            try {
+                const response = await fetch(`/api/todo/${user.uid}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        details: input,
+                        state: "active",
+                    }),
+                });
 
-            if (response.ok) {
-                const newTodo = await response.json();
-                setTodos([...todos, newTodo]);
-                setInput("");
-            } else {
+                if (response.ok) {
+                    const newTodo = await response.json();
+                    setTodos([...todos, newTodo]);
+                    setInput("");
+                } else {
+                    handleError();
+                }
+            } catch (error) {
                 handleError();
             }
-        } catch (error) {
-            handleError();
         }
     };
 
@@ -119,14 +135,14 @@ const TodoList: React.FC = () => {
                 }),
             });
             if (response.ok) {
-                setCookies([...todos.filter((t) => t.id !== todo.id)]);
-            }else{
+                setCookies('todos', [...todos.filter((t) => t.id !== todo.id)]);
+            } else {
                 handleError();
-                getCookies();
+                setTodos(JSON.parse(getCookies('todos')) as Todo[]);
             }
         } catch (error) {
             handleError();
-            getCookies();
+            setTodos(JSON.parse(getCookies('todos')) as Todo[]);
         }
     };
 
@@ -146,14 +162,14 @@ const TodoList: React.FC = () => {
             });
 
             if (response.ok) {
-                setCookies([...todos.filter(t => t.id !== todo.id), updatedTodo]);
+                setCookies('todos', [...todos.filter(t => t.id !== todo.id), updatedTodo]);
             } else {
                 handleError();
-                getCookies();
+                setTodos(JSON.parse(getCookies('todos')) as Todo[]);
             }
         } catch (error) {
             handleError();
-            getCookies();
+            setTodos(JSON.parse(getCookies('todos')) as Todo[]);
         }
     };
 
@@ -173,14 +189,14 @@ const TodoList: React.FC = () => {
             });
 
             if (response.ok) {
-                setCookies([...todos.filter(t => t.id !== todo.id), updatedTodo]);
+                setCookies('todos', [...todos.filter(t => t.id !== todo.id), updatedTodo]);
             } else {
                 handleError();
-                getCookies();
+                setTodos(JSON.parse(getCookies('todos')) as Todo[]);
             }
         } catch (error) {
             handleError();
-            getCookies();
+            setTodos(JSON.parse(getCookies('todos')) as Todo[]);
         }
     };
     return (
@@ -234,43 +250,46 @@ const TodoList: React.FC = () => {
                     </> :
                     <Box mt="4">
                         {todos
-                            .filter(todo => todo["state"] === 'active')
+                            .filter(todo => todo.state === 'active')
                             .map((todo) => (
-                                <Flex
-                                    key={todo["id"]} align="center" m="2" p="2" justify="space-between"
-                                    // border={'1px solid gray'} 
-                                    borderRadius={'md'}
-                                    boxShadow={'md'}
-                                >
-                                    <Editable defaultValue={todo.details} fontWeight={"bold"}>
-                                        <EditablePreview />
-                                        <EditableInput />
-                                    </Editable>
-                                    <Flex>
-                                        <IconButton
-                                            aria-label="Complete todo"
-                                            icon={<FontAwesomeIcon icon={faCheck} />}
-                                            onClick={() => handleCompletion(todo)}
-                                        />
-                                        <IconButton
-                                            aria-label="Delete todo"
-                                            icon={<FontAwesomeIcon icon={faTrash} />}
-                                            ml="2"
-                                            onClick={() => handleDelete(todo)}
-                                        />
+                                <SlideFade key={todo.id} in={true}>
+                                    <Flex
+                                        key={todo.id} align="center" m="2" p="2" justify="space-between"
+                                        // border={'1px solid gray'} 
+                                        borderRadius={'md'}
+                                        boxShadow={'md'}
+                                    >
+                                        <Editable defaultValue={todo.details} fontWeight={"bold"}>
+                                            <EditablePreview />
+                                            <EditableInput />
+                                        </Editable>
+                                        <Flex>
+                                            <IconButton
+                                                aria-label="Complete todo"
+                                                icon={<FontAwesomeIcon icon={faCheck} />}
+                                                onClick={() => handleCompletion(todo)}
+                                            />
+                                            <IconButton
+                                                aria-label="Delete todo"
+                                                icon={<FontAwesomeIcon icon={faTrash} />}
+                                                ml="2"
+                                                onClick={() => handleDelete(todo)}
+                                            />
+                                        </Flex>
                                     </Flex>
-                                </Flex>
+                                </SlideFade>
                             ))}
                         {todos
-                            .filter((t) => t["state"] === "completed")
+                            .filter((t) => t.state === "completed")
                             .map((todo) => (
+                                <SlideFade key={todo.id} in={true}>
                                 <Flex
-                                    key={todo["id"]} align="center" m="2" p="2" paddingX="2" justify="space-between"
+                                    key={todo.id} align="center" m="2" p="2" paddingX="2" justify="space-between"
                                     // border={'1px solid gray'} 
                                     borderRadius={'md'}
                                     boxShadow={'md'}
                                 >
-                                    <Text as="s" fontWeight={"bold"}>{todo["details"]}</Text>
+                                    <Text as="s" fontWeight={"bold"}>{todo.details}</Text>
                                     <Flex>
                                         <IconButton
                                             aria-label="Revive todo"
@@ -284,11 +303,12 @@ const TodoList: React.FC = () => {
                                             onClick={() => handleDelete(todo)}
                                         />
                                     </Flex>
-                                    {/* <Editable isDisabled defaultValue={todo["data"]} fontWeight={"bold"} >
+                                    {/* <Editable isDisabled defaultValue={todo.data} fontWeight={"bold"} >
                                     <EditablePreview />
                                     <EditableInput disabled />
                                 </Editable> */}
                                 </Flex>
+                                </SlideFade>
                             ))}
                     </Box>}
             </Box>

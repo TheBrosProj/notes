@@ -6,7 +6,8 @@ import {
     FormLabel,
     Input,
     Button,
-    useToast
+    useToast,
+    Center
 } from '@chakra-ui/react';
 import { auth } from '@/lib/firebase';
 import { useState } from 'react';
@@ -24,11 +25,11 @@ const Signup: React.FC = () => {
         setIsLoading(true);
         try {
             const res = await auth.createUserWithEmailAndPassword(email, password);
-            
+
             if (res.user?.email) {
                 setEmail(res.user.email);
             }
-            
+
             if (res.user?.uid) {
                 setUid(res.user.uid);
                 // Call the API route to create a user using the fetch API
@@ -40,8 +41,8 @@ const Signup: React.FC = () => {
                     body: JSON.stringify({ user: { email, uid: res.user.uid } })
                 });
             }
-            
-             // Redirect to dashboard on successful signup
+
+            // Redirect to dashboard on successful signup
         } catch (error) {
             console.log('Signup error:', error);
             toast({
@@ -76,14 +77,18 @@ const Signup: React.FC = () => {
                         onChange={(e) => setPassword(e.target.value)}
                     />
                 </FormControl>
-                <Button
-                    aria-label='sign up'
-                    type="submit"
-                    colorScheme="gray"
-                    mb={4}
-                >
-                    Sign Up
-                </Button>
+                <Center>
+                    <Button
+                        aria-label='sign up'
+                        type="submit"
+                        colorScheme="gray"
+                        m={4}
+                        p={6}
+                        borderRadius={'xl'}
+                    >
+                        Sign Up
+                    </Button>
+                </Center>
             </form>
         </Box>
     );

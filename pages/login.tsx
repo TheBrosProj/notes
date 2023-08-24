@@ -8,6 +8,7 @@ import {
     FormLabel,
     Input,
     Button,
+    Center,
 } from '@chakra-ui/react';
 import { auth } from '@/lib/firebase';
 
@@ -55,15 +56,19 @@ const Login: React.FC = () => {
                         onChange={(e) => setPassword(e.target.value)}
                     />
                 </FormControl>
-                <Button
-                    aria-label='Log in'
-                    isLoading={isLoading}
-                    type="submit"
-                    colorScheme="gray"
-                    mb={4}
-                >
-                    Log In
-                </Button>
+                <Center>
+                    <Button
+                        aria-label='Log in'
+                        isLoading={isLoading}
+                        type="submit"
+                        colorScheme="gray"
+                        m={4}
+                        p={6}
+                        borderRadius={'xl'}
+                    >
+                        Log In
+                    </Button>
+                </Center>
             </form>
         </Box>
     );

@@ -13,18 +13,22 @@ import {
     InputRightElement,
     SimpleGrid,
     Skeleton,
+    SlideFade,
     useToast
 } from "@chakra-ui/react";
 import { faLink, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAuth } from "./AuthContext";
 import Cookies from 'js-cookie';
+import { getCookies, setCookies } from "@/lib/cookies";
 
 type Note = {
     id: number;
     details: string;
     src: string | null;
 };
+
+
 
 const Notes: React.FC = () => {
     const [notes, setNotes] = useState<Note[]>([]);
@@ -39,28 +43,21 @@ const Notes: React.FC = () => {
             fetchNotes();
         }
         else {
-            getCookies();
+            setNotes(JSON.parse(getCookies('notes')) as Note[]);
+            setIsLoading(false);
         }
     }, [user]);
 
-    const setCookies = (noteArray: Note[]) => {
-        Cookies.set('notes', JSON.stringify(noteArray));
-    };
-
-    const getCookies = () => {
-        const CookieNotes: string | undefined = Cookies.get('notes');
-        if (CookieNotes) {
-            setNotes(JSON.parse(CookieNotes) as Note[]);
-            setIsLoading(false);
-        }
-        toast({
-            title: 'Loaded Notes',
-            description: "Loaded notes from cookies",
-            status: 'success',
-            duration: 3000,
-            isClosable: true,
-        })
-    };
+    // useEffect(() => {
+    //     const down = (e: KeyboardEvent) => {
+    //         if (e.key === "Enter") {
+    //             e.preventDefault();
+    //             handleAddNote();
+    //         }
+    //     }
+    //     document.addEventListener("keydown", down)
+    //     return () => document.removeEventListener("keydown", down)
+    // }, [])
 
     const fetchNotes = async () => {
         try {
@@ -69,8 +66,7 @@ const Notes: React.FC = () => {
             if (response.ok) {
                 const notesData = await response.json();
                 setNotes(notesData);
-                setCookies(notesData);
-                console.log("cookies set");
+                setCookies('notes',notesData);
             } else {
                 console.error("Failed to fetch notes");
             }
@@ -81,10 +77,10 @@ const Notes: React.FC = () => {
         }
     };
 
-    const handleError = () => {
+    const handleError = (title?: string, reason?: string) => {
         toast({
-            title: 'Error',
-            description: "Could not complete action, try again",
+            title: title ? title : 'Error',
+            description: reason ? reason : 'Could not complete action, try again',
             status: 'error',
             duration: 3000,
             isClosable: true,
@@ -129,14 +125,14 @@ const Notes: React.FC = () => {
                 }),
             });
             if (response.ok) {
-                setCookies([...notes.filter((t) => t.id !== note.id)]);
+                setCookies('notes',[...notes.filter((t) => t.id !== note.id)]);
             } else {
                 handleError();
-                getCookies();
+                setNotes(JSON.parse(getCookies('notes')) as Note[]);
             }
         } catch (error) {
             handleError();
-            getCookies();
+            setNotes(JSON.parse(getCookies('notes')) as Note[]);
         }
     };
     const handleUpdateNote = async (note: Note) => {
@@ -182,7 +178,7 @@ const Notes: React.FC = () => {
                     <Input
                         placeholder="Enter a new note"
                         value={input}
-                        onChange={(e) => setInput(e.target.value)}
+                        onChange={(e) => { setInput(e.target.value) }}
                         h={'24'}
                     />
                     <InputRightElement>
@@ -196,22 +192,22 @@ const Notes: React.FC = () => {
                 {isLoading ?
                     <>
                         <SimpleGrid minChildWidth='xs' spacing='3' p={'2'}>
-                            <Skeleton boxShadow={'md'} borderRadius={'2xl'}>
+                            <Skeleton boxShadow={'md'} borderRadius={'xl'}>
                                 <div>please wait while we load notes</div>
                                 <div>please wait while we load notes</div>
                                 <div>please wait while we load notes</div>
                             </Skeleton>
-                            <Skeleton boxShadow={'md'} borderRadius={'2xl'}>
+                            <Skeleton boxShadow={'md'} borderRadius={'xl'}>
                                 <div>please wait while we load notes</div>
                                 <div>please wait while we load notes</div>
                                 <div>please wait while we load notes</div>
                             </Skeleton>
-                            <Skeleton boxShadow={'md'} borderRadius={'2xl'}>
+                            <Skeleton boxShadow={'md'} borderRadius={'xl'}>
                                 <div>please wait while we load notes</div>
                                 <div>please wait while we load notes</div>
                                 <div>please wait while we load notes</div>
                             </Skeleton>
-                            <Skeleton boxShadow={'md'} borderRadius={'2xl'}>
+                            <Skeleton boxShadow={'md'} borderRadius={'xl'}>
                                 <div>please wait while we load notes</div>
                                 <div>please wait while we load notes</div>
                                 <div>please wait while we load notes</div>
@@ -220,8 +216,8 @@ const Notes: React.FC = () => {
                     </> :
                     <SimpleGrid minChildWidth='xs' spacing='4' p={'2'}>
                         {notes.map((note) => (
-                            <Box key={note.id} boxShadow={'md'} borderRadius={'md'}>
-                                <Flex key={note.details} align="center" m="2" justify="space-between">
+                            <SlideFade in={true} key={note.id}>
+                                <Flex key={note.id} align="center" m="2" justify="space-between" boxShadow={'md'} borderRadius={'md'}>
                                     <Editable fontSize='md' defaultValue={note.details} isTruncated onSubmit={(value) => handleUpdateNote({ ...note, details: value })}>
                                         <EditablePreview />
                                         <EditableInput />
@@ -243,7 +239,7 @@ const Notes: React.FC = () => {
                                         />
                                     </Flex>
                                 </Flex>
-                            </Box>
+                            </SlideFade>
                         ))}
                     </SimpleGrid>}
             </Box>
