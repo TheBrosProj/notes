@@ -45,9 +45,9 @@ const Notes: React.FC = () => {
     const { user } = useAuth();
 
     useEffect(() => {
+        setNotes(JSON.parse(getCookies('notes')) as Note[]);
+        setIsLoading(false);
         if (user) {
-            setNotes(JSON.parse(getCookies('notes')) as Note[]);
-            setIsLoading(false);
             fetchNotes();
         }
     }, [user]);
