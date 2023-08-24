@@ -119,6 +119,7 @@ const PomodoroTimer: React.FC = () => {
                     {isEditing ? (
                         <Slider colorScheme='gray' marginY={12} marginX={6} aria-label='time-slider'
                             min={10} max={70}
+                            value={duration}
                             // onBlurCapture={setIsEditing(false)}
                             onChange={(val:number) => handleDurationChange(val)}
                             onMouseEnter={() => setShowTooltip(true)}
