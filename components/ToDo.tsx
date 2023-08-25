@@ -247,10 +247,7 @@ const TodoList: React.FC = () => {
                                         borderRadius={'md'}
                                         boxShadow={'md'}
                                     >
-                                        <Editable defaultValue={todo.details} fontWeight={"bold"}>
-                                            <EditablePreview />
-                                            <EditableInput />
-                                        </Editable>
+                                        <Text fontWeight={"bold"}>{todo.details}</Text>
                                         <Flex>
                                             <IconButton
                                                 aria-label="Complete todo"
@@ -273,7 +270,6 @@ const TodoList: React.FC = () => {
                                 <SlideFade key={todo.id} in={true}>
                                     <Flex
                                         key={todo.id} align="center" m="2" p="2" paddingX="2" justify="space-between"
-                                        // border={'1px solid gray'} 
                                         borderRadius={'md'}
                                         boxShadow={'md'}
                                     >
@@ -291,10 +287,6 @@ const TodoList: React.FC = () => {
                                                 onClick={() => handleDelete(todo)}
                                             />
                                         </Flex>
-                                        {/* <Editable isDisabled defaultValue={todo.data} fontWeight={"bold"} >
-                                    <EditablePreview />
-                                    <EditableInput disabled />
-                                </Editable> */}
                                     </Flex>
                                 </SlideFade>
                             ))}

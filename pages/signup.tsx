@@ -45,9 +45,8 @@ const Signup: React.FC = () => {
                     },
                     body: JSON.stringify({ user: { email, uid: res.user.uid } })
                 });
+                router.push('/');
             }
-
-            // Redirect to dashboard on successful signup
         } catch (error) {
             console.log('Signup error:', error);
             toast({
@@ -58,7 +57,6 @@ const Signup: React.FC = () => {
             // Handle signup error
         } finally {
             setIsLoading(false);
-            router.push('/');
         }
     };
 
