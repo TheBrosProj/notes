@@ -28,13 +28,8 @@ import { faCheck, faPlus, faRepeat, faTrash } from "@fortawesome/free-solid-svg-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAuth } from "./AuthContext";
 import { getCookies, setCookies } from "@/lib/cookies";
+import { Todo } from "@/lib/types";
 
-interface Todo {
-    id: number;
-    details: string;
-    state: "active" | "completed";
-    time: number;
-}
 
 const TodoList: React.FC = () => {
     const [todos, setTodos] = useState<Todo[]>([]);
@@ -80,10 +75,12 @@ const TodoList: React.FC = () => {
     }
 
     const handleAddTodo = async () => {
-        if(user === null){
-            handleError("Log in to use Todo","you must sign in to store your todos in the database.")
+        if (user === null) {
+            handleError("Log in to use Todo", "you must sign in to store your todos in the database.")
             return;
         }
+        const newTempTodo: Todo = { id: 999999, details: input, state: "active", time: Date.now() };
+        setTodos((prev) => { return [...prev, newTempTodo] });
         if (input) {
             try {
                 const response = await fetch(`/api/todo/${user.uid}`, {
@@ -99,13 +96,16 @@ const TodoList: React.FC = () => {
 
                 if (response.ok) {
                     const newTodo = await response.json();
-                    setTodos([...todos, newTodo]);
+                    setTodos((prev) => { return [...prev.filter((t) => t.id !== newTempTodo.id), newTodo] });
                     setInput("");
                 } else {
                     handleError("failed to reach database");
+                    setTodos(JSON.parse(getCookies('todos')) as Todo[]);
                 }
             } catch (error) {
                 handleError();
+                setTodos(JSON.parse(getCookies('todos')) as Todo[]);
+
             }
         }
     };

@@ -27,12 +27,8 @@ import { faLink, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAuth } from "./AuthContext";
 import { getCookies, setCookies } from "@/lib/cookies";
-
-type Note = {
-    id: number;
-    details: string;
-    src: string | null;
-};
+import NoteModal from "./NoteModal";
+import { Note } from "@/lib/types";
 
 
 
@@ -81,10 +77,12 @@ const Notes: React.FC = () => {
     }
 
     const handleAddNote = async () => {
-        if(user === null){
-            handleError("Log in to use Notes","you must sign in to store your notes in the database.")
+        if (user === null) {
+            handleError("Log in to use Notes", "you must sign in to store your notes in the database.")
             return;
         }
+        const newTempNote : Note = {id: 999999,details: input,src:""};
+        setNotes((prev)=>{return [...prev,newTempNote]});
         try {
             const response = await fetch(`/api/note/${user.uid}`, {
                 method: "POST",
@@ -99,13 +97,15 @@ const Notes: React.FC = () => {
 
             if (response.ok) {
                 const newNote = await response.json();
-                setNotes([...notes, newNote]);
+                setNotes((prev) => { return [...prev.filter((n) => n.id !== newTempNote.id), newNote] });
                 setInput("");
             } else {
                 handleError("failed to reach database");
+                setNotes(JSON.parse(getCookies('notes')) as Note[]);
             }
         } catch (error) {
             handleError();
+            setNotes(JSON.parse(getCookies('notes')) as Note[]);
         }
     };
 
@@ -133,6 +133,11 @@ const Notes: React.FC = () => {
         }
     };
     const handleUpdateNote = async (note: Note) => {
+        setNotes((prev) => {
+            return prev.map((n) =>
+                n.id === note.id ? note : n
+            );
+        });
         try {
             const response = await fetch(`/api/note/${user.uid}`, {
                 method: 'PUT',
@@ -152,11 +157,14 @@ const Notes: React.FC = () => {
                     n.id === updatedNote.id ? updatedNote : n
                 );
                 setNotes(updatedNotes);
+                setCookies('notes', updatedNotes);
             } else {
                 handleError("failed to reach database");
+                setNotes(JSON.parse(getCookies('notes')) as Note[]);
             }
         } catch (error) {
             handleError();
+            setNotes(JSON.parse(getCookies('notes')) as Note[]);
         }
     };
 
@@ -215,10 +223,11 @@ const Notes: React.FC = () => {
                         {notes.map((note) => (
                             <SlideFade in={true} key={note.id}>
                                 <Flex key={note.id} align="center" m="2" justify="space-between" boxShadow={'md'} borderRadius={'md'}>
-                                    <Editable fontSize='md' defaultValue={note.details} isTruncated onSubmit={(value) => handleUpdateNote({ ...note, details: value })}>
+                                    {/* <Editable fontSize='md' defaultValue={note.details} isTruncated onSubmit={(value) => handleUpdateNote({ ...note, details: value })}>
                                         <EditablePreview />
                                         <EditableInput />
-                                    </Editable>
+                                    </Editable> */}
+                                    <NoteModal note={note} handleUpdateNote={handleUpdateNote} />
                                     <Flex>
                                         {note.src != null &&
                                             <IconButton
@@ -231,7 +240,7 @@ const Notes: React.FC = () => {
                                         <IconButton
                                             aria-label="Delete Note"
                                             icon={<FontAwesomeIcon icon={faTrash} />}
-                                            ml="2"
+                                            mx="2"
                                             onClick={() => handleDelete(note)}
                                         />
                                     </Flex>

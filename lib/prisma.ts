@@ -16,7 +16,7 @@ export const createUser = async (email: string, uid: string) => {
                 user_id: uid,
                 email: email,
                 last_online: new Date(),
-                blocklist: ['google.com'],
+                blocklist: [],
             },
         });
         return user;
