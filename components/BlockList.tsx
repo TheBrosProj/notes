@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Flex, Input, Button, Text, useToast } from '@chakra-ui/react';
+import { Flex, Input, Button, Text, useToast, Center, Box, IconButton } from '@chakra-ui/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from './AuthContext';
+import { getCookies, setCookies } from '@/lib/cookies'
 
 const BlocklistComponent = () => {
     const [blocklist, setBlocklist] = useState<string[]>([]);
@@ -10,13 +11,21 @@ const BlocklistComponent = () => {
     const toast = useToast();
     const { user } = useAuth();
 
+    useEffect(() => {
+        if (user) {
+            setBlocklist(JSON.parse(getCookies('blocklist')) as string[]);
+            fetchBlocklist();
+        }
+    }, [user]);
+
     const fetchBlocklist = async () => {
         try {
             const response = await fetch(`/api/blocklist/${user?.uid}`);
             const data = await response.json();
+            setCookies('blocklist', data);
             setBlocklist(data);
         } catch (error) {
-            console.error('Error fetching blocklist:', error);
+            handleError('Error fetching blocklist');
         }
     };
 
@@ -37,36 +46,19 @@ const BlocklistComponent = () => {
                     duration: 2000,
                 });
             } else {
-                throw new Error('Failed to update blocklist');
+                handleError('Failed to update blocklist');
             }
         } catch (error) {
-            console.error('Error updating blocklist:', error);
+            handleError('Error updating blocklist:');
         }
     };
 
     const deleteBlocklistItem = async (item: string) => {
-        try {
-            const response = await fetch(`/api/blocklist/${user.uid}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ item }),
-            });
-
-            if (response.ok) {
-                toast({
-                    title: 'Blocklist item deleted',
-                    status: 'success',
-                    duration: 2000,
-                });
-                fetchBlocklist(); // Refresh the blocklist after deletion
-            } else {
-                throw new Error('Failed to delete blocklist item');
-            }
-        } catch (error) {
-            console.error('Error deleting blocklist item:', error);
-        }
+        setBlocklist((prev) => {
+            const newBlocklist = prev.filter((b) => b == item);
+            setCookies('blocklist', newBlocklist);
+            return newBlocklist
+        });
     };
 
     useEffect(() => {
@@ -77,46 +69,65 @@ const BlocklistComponent = () => {
 
     const handleAddBlocklistItem = () => {
         if (newBlocklistItem.trim() === '') return;
-        setBlocklist([...blocklist, newBlocklistItem]);
+        const newUrl = new URL(newBlocklistItem);
+        if (!blocklist.includes(newUrl.hostname)) {
+            setBlocklist([...blocklist, newUrl.hostname]);
+        } else {
+            toast({
+                title: 'Blocklist entry already exists',
+                status: 'info',
+                duration: 2000,
+            });
+        }
         setNewBlocklistItem('');
     };
 
+    const handleError = (title = 'Error', reason = 'Could not complete action, try again') => {
+        toast({
+            title,
+            description: reason,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+        });
+    };
+
     return (
-        <Flex direction="column" p={4}>
-            {blocklist.map((item, index) => (
-                <Flex key={index} align="center" justify="space-between" my={1}>
-                    <Text>{item}</Text>
-                    <Flex align="center">
-                        <FontAwesomeIcon
-                            icon={faCheck}
-                            color="green"
-                            onClick={() => deleteBlocklistItem(item)} // Delete on icon click
-                            style={{ cursor: 'pointer', marginRight: '8px' }}
+        <Center>
+            <Box
+                p="2"
+                m="2"
+                w='3xl'
+                border="1px solid gray"
+                borderRadius="md"
+                boxShadow='lg'
+            >
+                <Flex direction="column" p={4}>
+                    {blocklist.map((item, index) => (
+                        <Flex key={index} align="center" justify="space-between" my={1}>
+                            <Text>{item}</Text>
+                            <Flex align="center">
+                                <IconButton aria-label='delete blocklist item' size={'lg'} onClick={() => deleteBlocklistItem(item)} icon={<FontAwesomeIcon icon={faTrash} />} />
+                            </Flex>
+                        </Flex>
+                    ))}
+                    <Flex mt={4}>
+                        <Input
+                            placeholder="Add new item"
+                            value={newBlocklistItem}
+                            onChange={(e) => setNewBlocklistItem(e.target.value)}
+                            mr={2}
                         />
-                        <FontAwesomeIcon
-                            icon={faTrash}
-                            color="red"
-                            onClick={() => deleteBlocklistItem(item)} // Delete on icon click
-                            style={{ cursor: 'pointer' }}
-                        />
+                        <Button colorScheme="gray" onClick={handleAddBlocklistItem}>
+                            Add
+                        </Button>
                     </Flex>
+                    <Button mt={4} colorScheme="gray" onClick={updateBlocklist}>
+                        Update Blocklist
+                    </Button>
                 </Flex>
-            ))}
-            <Flex mt={4}>
-                <Input
-                    placeholder="Add new item"
-                    value={newBlocklistItem}
-                    onChange={(e) => setNewBlocklistItem(e.target.value)}
-                    mr={2}
-                />
-                <Button colorScheme="teal" onClick={handleAddBlocklistItem}>
-                    Add
-                </Button>
-            </Flex>
-            <Button mt={4} colorScheme="blue" onClick={updateBlocklist}>
-                Update Blocklist
-            </Button>
-        </Flex>
+            </Box>
+        </Center>
     );
 };
 
