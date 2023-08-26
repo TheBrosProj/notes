@@ -10,9 +10,6 @@ import { useRouter } from "next/router";
 import {
     Box,
     Center,
-    Editable,
-    EditableInput,
-    EditablePreview,
     Flex,
     IconButton,
     Input,
@@ -81,31 +78,33 @@ const Notes: React.FC = () => {
             handleError("Log in to use Notes", "you must sign in to store your notes in the database.")
             return;
         }
-        const newTempNote : Note = {id: 999999,details: input,src:""};
-        setNotes((prev)=>{return [...prev,newTempNote]});
-        try {
-            const response = await fetch(`/api/note/${user.uid}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    details: input,
-                    src: null,
-                }),
-            });
+        if (input) {
+            const newTempNote: Note = { id: 999999, details: input, src: "" };
+            setNotes((prev) => { return [...prev, newTempNote] });
+            try {
+                const response = await fetch(`/api/note/${user.uid}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        details: input,
+                        src: null,
+                    }),
+                });
 
-            if (response.ok) {
-                const newNote = await response.json();
-                setNotes((prev) => { return [...prev.filter((n) => n.id !== newTempNote.id), newNote] });
-                setInput("");
-            } else {
-                handleError("failed to reach database");
+                if (response.ok) {
+                    const newNote = await response.json();
+                    setNotes((prev) => { return [...prev.filter((n) => n.id !== newTempNote.id), newNote] });
+                    setInput("");
+                } else {
+                    handleError("failed to reach database");
+                    setNotes(JSON.parse(getCookies('notes')) as Note[]);
+                }
+            } catch (error) {
+                handleError();
                 setNotes(JSON.parse(getCookies('notes')) as Note[]);
             }
-        } catch (error) {
-            handleError();
-            setNotes(JSON.parse(getCookies('notes')) as Note[]);
         }
     };
 

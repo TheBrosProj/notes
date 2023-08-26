@@ -12,9 +12,6 @@ import {
     Text,
     Box,
     Center,
-    Editable,
-    EditablePreview,
-    EditableInput,
     Flex,
     IconButton,
     Input,
@@ -79,9 +76,9 @@ const TodoList: React.FC = () => {
             handleError("Log in to use Todo", "you must sign in to store your todos in the database.")
             return;
         }
+        if (input) {
         const newTempTodo: Todo = { id: 999999, details: input, state: "active", time: Date.now() };
         setTodos((prev) => { return [...prev, newTempTodo] });
-        if (input) {
             try {
                 const response = await fetch(`/api/todo/${user.uid}`, {
                     method: "POST",
