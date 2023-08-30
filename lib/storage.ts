@@ -24,3 +24,17 @@ export function getCookies(name:string): string {
         return "[]";
     }
 };
+
+export const setLocal = (name: string,data: any) => {
+        localStorage.setItem(name, JSON.stringify(data));
+};
+
+
+export function getLocal(name:string): string {
+        const LocalNotes: string | null = localStorage.getItem(name);
+        if (LocalNotes != null) {
+            return LocalNotes;
+        }else{
+            return "[]";
+        }
+};

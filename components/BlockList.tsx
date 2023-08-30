@@ -3,7 +3,7 @@ import { Flex, Input, Button, Text, useToast, Center, Box, IconButton } from '@c
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from './AuthContext';
-import { getCookies, setCookies } from '@/lib/cookies'
+import { getCookies, setCookies } from '@/lib/storage'
 
 const BlocklistComponent = () => {
     const [blocklist, setBlocklist] = useState<string[]>([]);

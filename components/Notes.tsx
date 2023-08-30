@@ -23,7 +23,7 @@ import {
 import { faLink, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAuth } from "./AuthContext";
-import { getCookies, setCookies } from "@/lib/cookies";
+import { getLocal, setLocal } from "@/lib/storage";
 import NoteModal from "./NoteModal";
 import { Note } from "@/lib/types";
 
@@ -38,7 +38,7 @@ const Notes: React.FC = () => {
     const { user } = useAuth();
 
     useEffect(() => {
-        setNotes(JSON.parse(getCookies('notes')) as Note[]);
+        setNotes(JSON.parse(getLocal('notes')) as Note[]);
         setIsLoading(false);
         if (user) {
             fetchNotes();
@@ -52,7 +52,7 @@ const Notes: React.FC = () => {
             if (response.ok) {
                 const notesData = await response.json();
                 setNotes(notesData);
-                setCookies('notes', notesData);
+                setLocal('notes', notesData);
             } else {
                 handleError("failed to reach database");
             }
@@ -95,15 +95,18 @@ const Notes: React.FC = () => {
 
                 if (response.ok) {
                     const newNote = await response.json();
-                    setNotes((prev) => { return [...prev.filter((n) => n.id !== newTempNote.id), newNote] });
+                    setNotes((prev) => {
+                        setLocal('todos', [...prev.filter((t) => t.id !== newTempNote.id), newNote]);
+                        return [...prev.filter((n) => n.id !== newTempNote.id), newNote];
+                    });
                     setInput("");
                 } else {
                     handleError("failed to reach database");
-                    setNotes(JSON.parse(getCookies('notes')) as Note[]);
+                    setNotes(JSON.parse(getLocal('notes')) as Note[]);
                 }
             } catch (error) {
                 handleError();
-                setNotes(JSON.parse(getCookies('notes')) as Note[]);
+                setNotes(JSON.parse(getLocal('notes')) as Note[]);
             }
         }
     };
@@ -121,14 +124,14 @@ const Notes: React.FC = () => {
                 }),
             });
             if (response.ok) {
-                setCookies('notes', [...notes.filter((t) => t.id !== note.id)]);
+                setLocal('notes', [...notes.filter((t) => t.id !== note.id)]);
             } else {
                 handleError("failed to reach database");
-                setNotes(JSON.parse(getCookies('notes')) as Note[]);
+                setNotes(JSON.parse(getLocal('notes')) as Note[]);
             }
         } catch (error) {
             handleError();
-            setNotes(JSON.parse(getCookies('notes')) as Note[]);
+            setNotes(JSON.parse(getLocal('notes')) as Note[]);
         }
     };
     const handleUpdateNote = async (note: Note) => {
@@ -156,14 +159,14 @@ const Notes: React.FC = () => {
                     n.id === updatedNote.id ? updatedNote : n
                 );
                 setNotes(updatedNotes);
-                setCookies('notes', updatedNotes);
+                setLocal('notes', updatedNotes);
             } else {
                 handleError("failed to reach database");
-                setNotes(JSON.parse(getCookies('notes')) as Note[]);
+                setNotes(JSON.parse(getLocal('notes')) as Note[]);
             }
         } catch (error) {
             handleError();
-            setNotes(JSON.parse(getCookies('notes')) as Note[]);
+            setNotes(JSON.parse(getLocal('notes')) as Note[]);
         }
     };
 

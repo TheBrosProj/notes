@@ -5,14 +5,14 @@ import CookieConsentSlide from '@/components/CookieConsent';
 
 export default function Home() {
 
-// where magic happens
+  // where magic happens
 
   return (
     <>
-      <CookieConsentSlide />
-      <PomodoroTimer />
-      <TodoList />
-      <Notes />
+        <CookieConsentSlide />
+        <PomodoroTimer />
+        <TodoList />
+        <Notes />
     </>
   )
 }

@@ -24,7 +24,7 @@ import {
 import { faCheck, faPlus, faRepeat, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAuth } from "./AuthContext";
-import { getCookies, setCookies } from "@/lib/cookies";
+import { getLocal, setLocal } from "@/lib/storage";
 import { Todo } from "@/lib/types";
 
 
@@ -36,7 +36,7 @@ const TodoList: React.FC = () => {
     const { user } = useAuth();
 
     useEffect(() => {
-        setTodos(JSON.parse(getCookies('todos')) as Todo[]);
+        setTodos(JSON.parse(getLocal('todos')) as Todo[]);
         setIsLoading(false);
         if (user) {
             fetchTodos();
@@ -50,11 +50,12 @@ const TodoList: React.FC = () => {
             if (response.ok) {
                 const todosData = await response.json();
                 setTodos(todosData);
-                setCookies('todos', todosData);
+                setLocal('todos', todosData);
             } else {
                 handleError("failed to reach database");
             }
         } catch (error) {
+            console.log(error);
             handleError("failed to fetch todos");
         } finally {
             setIsLoading(false);
@@ -77,8 +78,8 @@ const TodoList: React.FC = () => {
             return;
         }
         if (input) {
-        const newTempTodo: Todo = { id: 999999, details: input, state: "active", time: Date.now() };
-        setTodos((prev) => { return [...prev, newTempTodo] });
+            const newTempTodo: Todo = { id: 999999, details: input, state: "active", time: Date.now() };
+            setTodos((prev) => { return [...prev, newTempTodo] });
             try {
                 const response = await fetch(`/api/todo/${user.uid}`, {
                     method: "POST",
@@ -93,15 +94,18 @@ const TodoList: React.FC = () => {
 
                 if (response.ok) {
                     const newTodo = await response.json();
-                    setTodos((prev) => { return [...prev.filter((t) => t.id !== newTempTodo.id), newTodo] });
+                    setTodos((prev) => {
+                        setLocal('todos', [...prev.filter((t) => t.id !== newTempTodo.id), newTodo]);
+                        return [...prev.filter((t) => t.id !== newTempTodo.id), newTodo];
+                    });
                     setInput("");
                 } else {
                     handleError("failed to reach database");
-                    setTodos(JSON.parse(getCookies('todos')) as Todo[]);
+                    setTodos(JSON.parse(getLocal('todos')) as Todo[]);
                 }
             } catch (error) {
                 handleError();
-                setTodos(JSON.parse(getCookies('todos')) as Todo[]);
+                setTodos(JSON.parse(getLocal('todos')) as Todo[]);
 
             }
         }
@@ -120,14 +124,14 @@ const TodoList: React.FC = () => {
                 }),
             });
             if (response.ok) {
-                setCookies('todos', [...todos.filter((t) => t.id !== todo.id)]);
+                setLocal('todos', [...todos.filter((t) => t.id !== todo.id)]);
             } else {
                 handleError("failed to reach database");
-                setTodos(JSON.parse(getCookies('todos')) as Todo[]);
+                setTodos(JSON.parse(getLocal('todos')) as Todo[]);
             }
         } catch (error) {
             handleError();
-            setTodos(JSON.parse(getCookies('todos')) as Todo[]);
+            setTodos(JSON.parse(getLocal('todos')) as Todo[]);
         }
     };
 
@@ -147,14 +151,14 @@ const TodoList: React.FC = () => {
             });
 
             if (response.ok) {
-                setCookies('todos', [...todos.filter(t => t.id !== todo.id), updatedTodo]);
+                setLocal('todos', [...todos.filter(t => t.id !== todo.id), updatedTodo]);
             } else {
                 handleError("failed to reach database");
-                setTodos(JSON.parse(getCookies('todos')) as Todo[]);
+                setTodos(JSON.parse(getLocal('todos')) as Todo[]);
             }
         } catch (error) {
             handleError();
-            setTodos(JSON.parse(getCookies('todos')) as Todo[]);
+            setTodos(JSON.parse(getLocal('todos')) as Todo[]);
         }
     };
 
@@ -174,14 +178,14 @@ const TodoList: React.FC = () => {
             });
 
             if (response.ok) {
-                setCookies('todos', [...todos.filter(t => t.id !== todo.id), updatedTodo]);
+                setLocal('todos', [...todos.filter(t => t.id !== todo.id), updatedTodo]);
             } else {
                 handleError("failed to reach database");
-                setTodos(JSON.parse(getCookies('todos')) as Todo[]);
+                setTodos(JSON.parse(getLocal('todos')) as Todo[]);
             }
         } catch (error) {
             handleError();
-            setTodos(JSON.parse(getCookies('todos')) as Todo[]);
+            setTodos(JSON.parse(getLocal('todos')) as Todo[]);
         }
     };
     return (
