@@ -5,18 +5,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthContext';
-import { useEffect } from 'react';
+
 
 export default function Navbar() {
     const router = useRouter();
     const { colorMode, toggleColorMode } = useColorMode()
     const [isSmallScreen] = useMediaQuery("(max-width: 600px)");
     const { user } = useAuth();
-    useEffect(() => {
-        if (user) {
-            console.log(user.uid);
-        }
-    }, [user])
+
     return (
         <Flex as="nav" align="center" justify="space-around" p={4} fontWeight={"extrabold"}>
             <Link href="/">
@@ -34,7 +30,7 @@ export default function Navbar() {
                         {user ? (
                             <>
                                 <MenuItem aria-label='profile' onClick={() => router.push("/profile")}>Account</MenuItem>
-                                <MenuItem aria-label='log out' onClick={() => {auth.signOut();router.push("/");}}>Log Out</MenuItem>
+                                <MenuItem aria-label='log out' onClick={() => { auth.signOut(); router.push("/"); }}>Log Out</MenuItem>
                             </>
                         ) : (
                             <>
