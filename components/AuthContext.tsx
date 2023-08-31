@@ -5,9 +5,19 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { auth } from '@/lib/firebase';
 
+
+interface data {
+    user_id: string;
+    email: string;
+    last_online: string;
+    blocklist: string[];
+}
+
 interface AuthContextType {
     user: any | null;
     setUser: React.Dispatch<React.SetStateAction<any | null>>;
+    ping: data | null;
+    triggerPing: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -18,6 +28,31 @@ interface AuthProviderProps {
 
 const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState<any | null>(null);
+    const [ping, setPing] = useState<data | null>(null);
+    useEffect(() => {
+        if (user) {
+            triggerPing();
+        }
+    }, [user])
+
+    const triggerPing = async () => {
+        try {
+            const response = await fetch(`/api/ping/${user.uid}`);
+
+            if (response.ok) {
+                const pingData = await response.json();
+                setPing(pingData as data);
+                console.log(pingData);
+            } else {
+                console.log("failed to reach database");
+            }
+        } catch (error) {
+            console.log(error);
+            // handleError("failed to fetch todos");
+        } finally {
+            // setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(u => {
@@ -31,7 +66,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }, []);
 
     return (
-        <AuthContext.Provider value={{ user, setUser }}>
+        <AuthContext.Provider value={{ user, setUser, ping, triggerPing }}>
             {children}
         </AuthContext.Provider>
     );

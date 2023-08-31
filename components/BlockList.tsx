@@ -3,29 +3,27 @@ import { Flex, Input, Button, Text, useToast, Center, Box, IconButton } from '@c
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from './AuthContext';
-import { getCookies, setCookies } from '@/lib/storage'
+import { getLocal, setLocal } from '@/lib/storage'
 
 const BlocklistComponent = () => {
-    const [blocklist, setBlocklist] = useState<string[]>([]);
+    const [blocklist, setBlocklist] = useState<string[]>(JSON.parse(getLocal('blocklist')) as string[]);
     const [newBlocklistItem, setNewBlocklistItem] = useState('');
     const toast = useToast();
-    const { user } = useAuth();
+    const { user,ping } = useAuth();
 
     useEffect(() => {
         if (user) {
-            setBlocklist(JSON.parse(getCookies('blocklist')) as string[]);
             fetchBlocklist();
         }
-    }, [user]);
+    }, [user,ping]);
 
     const fetchBlocklist = async () => {
-        try {
-            const response = await fetch(`/api/blocklist/${user?.uid}`);
-            const data = await response.json();
-            setCookies('blocklist', data);
-            setBlocklist(data);
-        } catch (error) {
-            handleError('Error fetching blocklist');
+        if(ping){
+            // console.log(JSON.parse(getLocal('blocklist')) as string[]);
+            setBlocklist(prev =>{
+                setLocal('blocklist',ping.blocklist);
+                return ping.blocklist;
+            });
         }
     };
 
@@ -56,7 +54,7 @@ const BlocklistComponent = () => {
     const deleteBlocklistItem = async (item: string) => {
         setBlocklist((prev) => {
             const newBlocklist = prev.filter((b) => b == item);
-            setCookies('blocklist', newBlocklist);
+            setLocal('blocklist', newBlocklist);
             return newBlocklist
         });
     };

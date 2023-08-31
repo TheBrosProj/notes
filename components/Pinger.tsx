@@ -1,44 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 
-interface data {
-    user_id: string;
-    email: string;
-    last_online: string;
-    blocklist: string[];
-}
 
 interface TimeAgoProps {
     //   timestamp: string;
 }
 
 export function Pinger(props: TimeAgoProps): JSX.Element {
-    const { user } = useAuth();
-    const [ping, setPing] = useState<data | null>(null);
-    useEffect(() => {
-        if (user) {
-            pingDB();
-        }
-    }, [user])
+    const { ping } = useAuth();
 
-    const pingDB = async () => {
-        try {
-            const response = await fetch(`/api/ping/${user.uid}`);
-
-            if (response.ok) {
-                const pingData = await response.json();
-                setPing(pingData as data);
-                console.log(pingData);
-            } else {
-                console.log("failed to reach database");
-            }
-        } catch (error) {
-            console.log(error);
-            // handleError("failed to fetch todos");
-        } finally {
-            // setIsLoading(false);
-        }
-    };
     const [timeAgo, setTimeAgo] = useState<string>('');
 
     useEffect(() => {
