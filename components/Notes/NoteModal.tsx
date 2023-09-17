@@ -6,15 +6,16 @@
 import { Button, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Textarea, useDisclosure } from "@chakra-ui/react"
 import { Note } from "@/lib/types";
 import { useState } from "react";
+import { useNotes } from "./NotesContext";
 
 interface NoteModalProps {
     note: Note,
-    handleUpdateNote: (note: Note) => Promise<void>
 }
 
-export default function NoteModal({ note, handleUpdateNote }: NoteModalProps) {
+export default function NoteModal({ note }: NoteModalProps) {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [value, SetValue] = useState(note.details);
+    const { handleUpdateNote, SetCurrentNote } = useNotes();
     const handleClick = () => {
         onOpen();
     }
@@ -28,7 +29,7 @@ export default function NoteModal({ note, handleUpdateNote }: NoteModalProps) {
         <>
             <Button
                 backgroundColor={'transparent'}
-                onClick={() => handleClick()}
+                onClick={() =>{handleClick()}}
                 p={8} w={'72'}>
                 {note.details.substring(0, 24) + "..."}</Button>
             <Modal onClose={onClose} size={'xl'} isOpen={isOpen}>

@@ -1,6 +1,6 @@
 import PomodoroTimer from '@/components/Pomodoro';
 import TodoList from '@/components/ToDo';
-import Notes from '@/components/Notes';
+import Notes from '@/components/Notes/Notes';
 import CookieConsentSlide from '@/components/CookieConsent';
 
 export default function Home() {
@@ -9,7 +9,7 @@ export default function Home() {
 
   return (
     <>
-        <CookieConsentSlide />
+        {/* <CookieConsentSlide /> */}
         <PomodoroTimer />
         <TodoList />
         <Notes />

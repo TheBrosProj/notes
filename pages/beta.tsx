@@ -1,6 +1,6 @@
 import PomodoroTimer from '@/components/Pomodoro';
 import TodoList from '@/components/ToDo';
-import Notes from '@/components/Notes';
+import Notes from '@/components/Notes/Notes';
 import Summarizer from '@/components/Summarizer';
 import BlocklistEditor from '@/components/BlockList';
 import { Button, Center } from '@chakra-ui/react';
