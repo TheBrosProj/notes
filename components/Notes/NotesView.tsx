@@ -1,22 +1,27 @@
-import { Note } from "@/lib/types"
-import { Textarea } from "@chakra-ui/react";
-import { useState } from "react";
+import { Box, Textarea } from "@chakra-ui/react";
+import { useNotes } from "./NotesContext";
 
 interface NoteViewProps {
-    note: Note,
 }
 
-export function NotesView({ note }: NoteViewProps) {
-    const [value, SetValue] = useState(note.details);
+export function NotesView({ }: NoteViewProps) {
+    const { currentNote, handleUpdateNote } = useNotes();
     return (
         <>
-            <Textarea
-                h={'50vh'}
-                value={value}
-                onChange={(e) => { SetValue(e.target.value); }}
-                size='lg'
-                resize={'none'}
-            />
+            <Box
+                border="1px solid gray"
+                borderRadius="md"
+                m={"4"}>
+                <Textarea
+                    h={'2xl'}
+                    w={'3xl'}
+                    value={currentNote?.details}
+                    // onChange={(e) => { handleUpdateNote({...currentNote, details: e.target.value})); }}
+                    disabled
+                    resize={'none'}
+                    border="none"
+                />
+            </Box>
         </>
     )
 }

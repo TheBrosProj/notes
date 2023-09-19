@@ -26,6 +26,7 @@ export default function Navbar() {
                     <MenuList>
                         <MenuItem aria-label='home' onClick={() => router.push("/")}>Home</MenuItem>
                         <MenuItem aria-label='about' onClick={() => router.push("/about")}>About</MenuItem>
+                        <MenuItem aria-label='notes' onClick={() => router.push("/notes")}>Notes</MenuItem>
                         <MenuItem aria-label='beta' onClick={() => router.push("/beta")}>Beta</MenuItem>
                         {user ? (
                             <>
@@ -37,14 +38,14 @@ export default function Navbar() {
                                 <MenuItem aria-label='login' onClick={() => router.push("/login")}>Log In</MenuItem>
                                 <MenuItem aria-label='signup' onClick={() => router.push("/signup")}>Sign Up</MenuItem>
                             </>
-                        )
-                        }
+                        )}
                     </MenuList>
                 </Menu>
             ) : (
                 <>
                     <Link aria-label='home' href="/">Home</Link>
                     <Link aria-label='about' href="/about">About</Link>
+                    <Link aria-label='notes' href="/notes">Notes</Link>
                     <Link aria-label='beta' href="/beta">Beta</Link>
                 </>
             )}

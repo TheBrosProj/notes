@@ -13,9 +13,9 @@ export default function App({ Component, pageProps }: AppProps) {
 
         <ColorModeScript initialColorMode={"dark"} />
         <AuthProvider>
-          <NotesProvider>
           <title>Notes</title>
           <Navbar />
+          <NotesProvider>
           <Component {...pageProps} />
           </NotesProvider>
         </AuthProvider>

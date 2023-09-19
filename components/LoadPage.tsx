@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Center, Spinner, Text, Box, DarkMode, FlexProps } from '@chakra-ui/react';
+import { Center, Spinner, Text, Box, FlexProps } from '@chakra-ui/react';
 
 interface LoadPageProps extends FlexProps {
     children: React.ReactNode;

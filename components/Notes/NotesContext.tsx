@@ -4,17 +4,18 @@
  * as a pwa without any internet access
  */
 
-
 import { getLocal, setLocal } from "@/lib/storage";
 import { Note } from "@/lib/types";
 import { ReactNode, SetStateAction, createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "../AuthContext";
+import { useToast } from "@chakra-ui/react";
 interface NotesContextType {
     notes: Note[],
     setNotes: React.Dispatch<SetStateAction<Note[]>>,
     handleAddNote: (input: string) => Promise<void>,
     handleDelete: (note: Note) => Promise<void>,
     handleUpdateNote: (note: Note) => Promise<void>,
+    handleError: (title?: string, reason?: string) => void,
     currentNote: Note | null,
     SetCurrentNote: React.Dispatch<SetStateAction<Note | null>>
 }
@@ -28,21 +29,21 @@ interface NotesProviderProps {
 
 const NotesProvider: React.FC<NotesProviderProps> = ({ children }) => {
     const [notes, setNotes] = useState<Note[]>([]);
+    const toast = useToast();
     const [currentNote, SetCurrentNote] = useState<Note|null>(null);
     const { user } = useAuth();
 
-    useEffect(()=>{
-    console.log(currentNote);
-    },[currentNote]);
+    // useEffect(()=>{
+    // console.log(currentNote);
+    // },[currentNote]);
     const handleError = (title?: string, reason?: string) => {
-        console.error(title + ":" + reason);
-        // toast({
-        //     title: title ? title : 'Error',
-        //     description: reason ? reason : 'Could not complete action, try again',
-        //     status: 'error',
-        //     duration: 3000,
-        //     isClosable: true,
-        // })
+        toast({
+            title: title ? title : 'Error',
+            description: reason ? reason : 'Could not complete action, try again',
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+        })
     }
 
     useEffect(() => {
@@ -165,7 +166,7 @@ const NotesProvider: React.FC<NotesProviderProps> = ({ children }) => {
         }
     };
     return (
-        <NotesContext.Provider value={{ notes, setNotes, handleAddNote, handleDelete, handleUpdateNote, currentNote, SetCurrentNote }}>
+        <NotesContext.Provider value={{ notes, setNotes, handleAddNote, handleDelete, handleUpdateNote, handleError, currentNote, SetCurrentNote }}>
             {children}
         </NotesContext.Provider>
     );

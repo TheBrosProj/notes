@@ -15,7 +15,7 @@ interface NoteModalProps {
 export default function NoteModal({ note }: NoteModalProps) {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [value, SetValue] = useState(note.details);
-    const { handleUpdateNote, SetCurrentNote } = useNotes();
+    const { handleUpdateNote } = useNotes();
     const handleClick = () => {
         onOpen();
     }

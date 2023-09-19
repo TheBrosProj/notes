@@ -13,7 +13,6 @@ import {
     Input,
     InputGroup,
     InputRightElement,
-    useToast
 } from "@chakra-ui/react";
 import { faLink, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -24,18 +23,7 @@ import { useNotes } from "./NotesContext";
 
 const Notes: React.FC = () => {
     const [input, setInput] = useState<string>("");
-    const {notes, setNotes, handleAddNote} = useNotes();
-    const toast = useToast();
-
-    const handleError = (title?: string, reason?: string) => {
-        toast({
-            title: title ? title : 'Error',
-            description: reason ? reason : 'Could not complete action, try again',
-            status: 'error',
-            duration: 3000,
-            isClosable: true,
-        })
-    }
+    const { handleAddNote } = useNotes();
 
     return (
         <Center>
@@ -59,11 +47,11 @@ const Notes: React.FC = () => {
                         <IconButton
                             aria-label="Add Notes"
                             icon={<FontAwesomeIcon icon={faPlus} />}
-                            onClick={()=>{handleAddNote(input);setInput('');}}
+                            onClick={() => { handleAddNote(input); setInput(''); }}
                         />
                     </InputRightElement>
                 </InputGroup>
-                <NotesList/>
+                <NotesList />
             </Box>
         </Center>
     );
