@@ -59,7 +59,7 @@ export default function Navbar() {
                             <Link aria-label='profile' href="/profile">
                                 <Avatar
                                     size="sm"
-                                    name={user.email}
+                                    name={user.email!}
                                     src={`https://api.dicebear.com/6.x/fun-emoji/svg?seed=${user.uid}`}
                                     mr={2}
                                 />

@@ -45,7 +45,7 @@ const TodoList: React.FC = () => {
 
     const fetchTodos = async () => {
         try {
-            const response = await fetch(`/api/todo/${user.uid}`);
+            const response = await fetch(`/api/todo/${user?.uid}`);
 
             if (response.ok) {
                 const todosData = await response.json();
@@ -114,7 +114,7 @@ const TodoList: React.FC = () => {
     const handleDelete = async (todo: Todo) => {
         setTodos(prev => [...prev.filter((t) => t.id !== todo.id)]);
         try {
-            const response = await fetch(`/api/todo/${user.uid}`, {
+            const response = await fetch(`/api/todo/${user?.uid}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
@@ -139,7 +139,7 @@ const TodoList: React.FC = () => {
         const updatedTodo: Todo = { ...todo, state: "completed" };
         setTodos([...todos.filter(t => t.id !== todo.id), updatedTodo]);
         try {
-            const response = await fetch(`/api/todo/${user.uid}`, {
+            const response = await fetch(`/api/todo/${user?.uid}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -166,7 +166,7 @@ const TodoList: React.FC = () => {
         const updatedTodo: Todo = { ...todo, state: "active" };
         setTodos([...todos.filter(t => t.id !== todo.id), updatedTodo]);
         try {
-            const response = await fetch(`/api/todo/${user.uid}`, {
+            const response = await fetch(`/api/todo/${user?.uid}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

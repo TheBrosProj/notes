@@ -25,7 +25,7 @@ export default function Profile() {
           borderRadius='full'
           boxSize="150px"
           src={`https://api.dicebear.com/6.x/fun-emoji/svg?seed=${user.uid}`}
-          alt={user.email}
+          alt={user.email!}
           ></Image>
           <Text>
             <strong>Email :</strong> {user.email}
