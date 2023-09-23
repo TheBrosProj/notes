@@ -3,8 +3,8 @@
 */
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { auth } from '@/lib/firebase';
-import firebase from "firebase/app"
+import { auth,firebaseUser } from '@/lib/firebase';
+import { setCookies } from '@/lib/storage';
 
 interface data {
     user_id: string;
@@ -14,8 +14,8 @@ interface data {
 }
 
 interface AuthContextType {
-    user: firebase.User | null;
-    setUser: React.Dispatch<React.SetStateAction<firebase.User | null>>;
+    user: firebaseUser | null;
+    setUser: React.Dispatch<React.SetStateAction<firebaseUser | null>>;
     ping: data | null;
     triggerPing: () => Promise<void>
 }
@@ -27,11 +27,12 @@ interface AuthProviderProps {
 }
 
 const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-    const [user, setUser] = useState<firebase.User | null>(null);
+    const [user, setUser] = useState<firebaseUser | null>(null);
     const [ping, setPing] = useState<data | null>(null);
     useEffect(() => {
         if (user) {
             triggerPing();
+            setCookies('auth_id',user.uid);
         }
     }, [user])
 
@@ -49,9 +50,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 }
             } catch (error) {
                 console.log(error);
-                // handleError("failed to fetch todos");
             } finally {
-                // setIsLoading(false);
             }
         }
     };

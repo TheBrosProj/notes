@@ -36,7 +36,7 @@ export default function NoteList({ ListType }: NoteListProps) {
                                 <NoteModal note={note} />
                             </> : <>
                                 <Button
-                                    w={'64'}
+                                    w={'full'}
                                     backgroundColor={'transparent'}
                                     onClick={() => { handleClick(note); router.push(`/${user?.uid}/${note.id}`) }}>
                                     {note.details.substring(0, 24) + "..."}</Button>

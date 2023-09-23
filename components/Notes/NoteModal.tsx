@@ -16,7 +16,6 @@ interface NoteModalProps {
 
 export default function NoteModal({ note }: NoteModalProps) {
     const { isOpen, onOpen, onClose } = useDisclosure();
-    console.log(note);
     const { handleUpdateNote } = useNotes();
     const [value, SetValue] = useState(note.details);
     const { user } = useAuth();
