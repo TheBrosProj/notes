@@ -51,7 +51,7 @@ const Notes: React.FC = () => {
                         />
                     </InputRightElement>
                 </InputGroup>
-                <NotesList />
+                <NotesList ListType="modal" />
             </Box>
         </Center>
     );

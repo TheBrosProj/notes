@@ -8,6 +8,16 @@ export default async function handler(
   // auth_id is used as query instead of body for convience in our other projects
   // where showing we might not even use body for apis. 
   const { auth_id } = req.query;
+  // console.log(auth_id ==( req.cookies.auth_id as string));
+  // console.log(auth_id);
+  // console.log(auth_id);
+  // console.log(req.cookies.auth_id as string);
+  // if(auth_id ==( req.cookies.auth_id as string)){
+  //   console.log("failed");
+  //   console.log(req.cookies.auth_id as string);
+  //   res.status(405).end();
+  //   return;
+  // }
   // get notes
   if (req.method === 'GET') {
     try {

@@ -9,7 +9,7 @@ export default function Home() {
 
   return (
     <>
-        {/* <CookieConsentSlide /> */}
+        <CookieConsentSlide />
         <PomodoroTimer />
         <TodoList />
         <Notes />

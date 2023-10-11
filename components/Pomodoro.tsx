@@ -7,12 +7,12 @@ import { useEffect, useState } from 'react';
 
 const PomodoroTimer: React.FC = () => {
     const [duration, setDuration] = useState<number>(25);
-    const [timeLeft, setTimeLeft] = useState<number>(duration * 60);
+    const [timeLeft, setTimeLeft] = useState<number>(duration*60);
     const [isRunning, setIsRunning] = useState<boolean>(false);
     const [isEditing, setIsEditing] = useState<boolean>(false);
-    // const [playing, setPlaying] = useState<boolean>(false);
+    const [playing, setPlaying] = useState<boolean>(false);
     const [showTooltip, setShowTooltip] = useState<boolean>(false);
-    // const audio = new Audio(chime);
+    const audio = new Audio('/chime.wav');
 
     useEffect(() => {
         if (isRunning) {
@@ -23,40 +23,38 @@ const PomodoroTimer: React.FC = () => {
         }
     }, [isRunning]);
 
-    // useEffect(() => {
-    //     if (timeLeft === 0) {
-    //         setIsRunning(false);
-    //         if (playing) {
-    //             audio.pause();
-    //         } else {
-    //             audio.loop = true;
-    //             audio.play();
-    //         }
-    //         setPlaying(!playing);
-    //     }
-    // }, [timeLeft]);
+    useEffect(() => {
+        if (timeLeft === 0) {
+            setIsRunning(false);
+            if (!playing) {
+                // audio.loop = true;
+                audio.play();
+            }
+            setPlaying(!playing);
+        }
+    }, [timeLeft]);
 
-    // const stopAudio = () => {
-    //     audio.pause();
-    //     audio.currentTime = 0;
-    //     setPlaying(false);
-    // }
+    const stopAudio = () => {
+        audio.loop = false;
+        audio.pause();
+        audio.currentTime = 0;
+        setPlaying(false);
+    }
 
     const handleStart = () => {
-        setIsEditing(false)
+        setIsEditing(false);
         setIsRunning(true);
     };
 
     const handlePause = () => {
-        setIsEditing(false)
+        setIsEditing(false);
         setIsRunning(false);
     };
 
     const handleStop = () => {
-        setIsEditing(false)
+        setIsEditing(false);
         setIsRunning(false);
         setTimeLeft(duration * 60);
-        // stopAudio();
     };
 
     const handleEdit = () => {

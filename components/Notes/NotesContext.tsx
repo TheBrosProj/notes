@@ -8,14 +8,13 @@ import { getLocal, setLocal } from "@/lib/storage";
 import { Note } from "@/lib/types";
 import { ReactNode, SetStateAction, createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "../AuthContext";
-import { useToast } from "@chakra-ui/react";
+import { useApp } from "../AppContext";
 interface NotesContextType {
     notes: Note[],
     setNotes: React.Dispatch<SetStateAction<Note[]>>,
     handleAddNote: (input: string) => Promise<void>,
     handleDelete: (note: Note) => Promise<void>,
     handleUpdateNote: (note: Note) => Promise<void>,
-    handleError: (title?: string, reason?: string) => void,
     currentNote: Note | null,
     SetCurrentNote: React.Dispatch<SetStateAction<Note | null>>
 }
@@ -29,22 +28,13 @@ interface NotesProviderProps {
 
 const NotesProvider: React.FC<NotesProviderProps> = ({ children }) => {
     const [notes, setNotes] = useState<Note[]>([]);
-    const toast = useToast();
     const [currentNote, SetCurrentNote] = useState<Note|null>(null);
     const { user } = useAuth();
+    const { handleError } = useApp();
 
     // useEffect(()=>{
     // console.log(currentNote);
     // },[currentNote]);
-    const handleError = (title?: string, reason?: string) => {
-        toast({
-            title: title ? title : 'Error',
-            description: reason ? reason : 'Could not complete action, try again',
-            status: 'error',
-            duration: 3000,
-            isClosable: true,
-        })
-    }
 
     useEffect(() => {
         setNotes(JSON.parse(getLocal('notes')) as Note[]);
@@ -55,7 +45,7 @@ const NotesProvider: React.FC<NotesProviderProps> = ({ children }) => {
 
     const fetchNotes = async () => {
         try {
-            const response = await fetch(`/api/note/${user.uid}`);
+            const response = await fetch(`/api/note/${user?.uid}`);
 
             if (response.ok) {
                 const notesData = await response.json();
@@ -110,7 +100,7 @@ const NotesProvider: React.FC<NotesProviderProps> = ({ children }) => {
     const handleDelete = async (note: Note) => {
         setNotes(prev => [...prev.filter((t) => t.id !== note.id)]);
         try {
-            const response = await fetch(`/api/note/${user.uid}`, {
+            const response = await fetch(`/api/note/${user?.uid}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
@@ -137,7 +127,7 @@ const NotesProvider: React.FC<NotesProviderProps> = ({ children }) => {
             );
         });
         try {
-            const response = await fetch(`/api/note/${user.uid}`, {
+            const response = await fetch(`/api/note/${user?.uid}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -175,7 +165,7 @@ const NotesProvider: React.FC<NotesProviderProps> = ({ children }) => {
 const useNotes = (): NotesContextType => {
     const context = useContext(NotesContext);
     if (context === undefined) {
-        throw new Error('useNotes must be used within an AuthProvider');
+        throw new Error('useNotes must be used within an NotesProvider');
     }
     return context;
 };

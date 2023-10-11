@@ -1,27 +1,38 @@
-import { Box, Textarea } from "@chakra-ui/react";
+import { Box, Button, Center, FlexProps, Textarea } from "@chakra-ui/react";
 import { useNotes } from "./NotesContext";
+import { useState } from "react";
 
-interface NoteViewProps {
+interface NoteViewProps extends FlexProps {
 }
 
-export function NotesView({ }: NoteViewProps) {
+export function NotesView({ ...rest }: NoteViewProps) {
     const { currentNote, handleUpdateNote } = useNotes();
+    const [value, SetValue] = useState(currentNote ? currentNote!.details : "");
+    if (!currentNote) {
+        return <></>
+    }
+
+    const handleSave = () => {
+        if (currentNote!.details !== value) {
+            handleUpdateNote({ ...currentNote!, details: value });
+        }
+    }
     return (
-        <>
-            <Box
+        <Box {...rest}>
+            <Center gap={"8"}>
+                <Button onClick={()=>{handleSave();}}>Save</Button>
+            </Center>
+            <Textarea
+                value={value}
+                onChange={(e) => { SetValue(e.target.value); }}
+                // disabled
+                resize={'none'}
+                h={'full'}
+                w={'full'}
                 border="1px solid gray"
                 borderRadius="md"
-                m={"4"}>
-                <Textarea
-                    h={'2xl'}
-                    w={'3xl'}
-                    value={currentNote?.details}
-                    // onChange={(e) => { handleUpdateNote({...currentNote, details: e.target.value})); }}
-                    disabled
-                    resize={'none'}
-                    border="none"
-                />
-            </Box>
-        </>
+                m={"4"}
+            />
+        </Box>
     )
 }

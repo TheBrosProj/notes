@@ -1,3 +1,4 @@
+import { AppProvider } from '@/components/AppContext'
 import { AuthProvider } from '@/components/AuthContext'
 import LoadPage from '@/components/LoadPage'
 import Navbar from '@/components/Navbar'
@@ -10,15 +11,16 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <ChakraProvider>
       <LoadPage>
-
         <ColorModeScript initialColorMode={"dark"} />
-        <AuthProvider>
-          <title>Notes</title>
-          <Navbar />
-          <NotesProvider>
-          <Component {...pageProps} />
-          </NotesProvider>
-        </AuthProvider>
+        <AppProvider>
+          <AuthProvider>
+            <title>Notes</title>
+            <Navbar />
+            <NotesProvider>
+              <Component {...pageProps} />
+            </NotesProvider>
+          </AuthProvider>
+        </AppProvider>
       </LoadPage>
     </ChakraProvider>
   )

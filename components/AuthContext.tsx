@@ -3,8 +3,8 @@
 */
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { auth } from '@/lib/firebase';
-
+import { auth,firebaseUser } from '@/lib/firebase';
+import { setCookies } from '@/lib/storage';
 
 interface data {
     user_id: string;
@@ -14,8 +14,8 @@ interface data {
 }
 
 interface AuthContextType {
-    user: any | null;
-    setUser: React.Dispatch<React.SetStateAction<any | null>>;
+    user: firebaseUser | null;
+    setUser: React.Dispatch<React.SetStateAction<firebaseUser | null>>;
     ping: data | null;
     triggerPing: () => Promise<void>
 }
@@ -27,30 +27,31 @@ interface AuthProviderProps {
 }
 
 const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-    const [user, setUser] = useState<any | null>(null);
+    const [user, setUser] = useState<firebaseUser | null>(null);
     const [ping, setPing] = useState<data | null>(null);
     useEffect(() => {
         if (user) {
             triggerPing();
+            setCookies('auth_id',user.uid);
         }
     }, [user])
 
     const triggerPing = async () => {
-        try {
-            const response = await fetch(`/api/ping/${user.uid}`);
+        if (user != null) {
+            try {
+                const response = await fetch(`/api/ping/${user.uid}`);
 
-            if (response.ok) {
-                const pingData = await response.json();
-                setPing(pingData as data);
-                console.log(pingData);
-            } else {
-                console.log("failed to reach database");
+                if (response.ok) {
+                    const pingData = await response.json();
+                    setPing(pingData as data);
+                    console.log(pingData);
+                } else {
+                    console.log("failed to reach database");
+                }
+            } catch (error) {
+                console.log(error);
+            } finally {
             }
-        } catch (error) {
-            console.log(error);
-            // handleError("failed to fetch todos");
-        } finally {
-            // setIsLoading(false);
         }
     };
 

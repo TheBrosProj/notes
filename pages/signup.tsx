@@ -14,7 +14,7 @@ import {
     useToast,
     Center
 } from '@chakra-ui/react';
-import { auth } from '@/lib/firebase';
+import { GoogleProvider, auth, firebaseUser } from '@/lib/firebase';
 import { useState } from 'react';
 
 const Signup: React.FC = () => {
@@ -25,36 +25,58 @@ const Signup: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const toast = useToast();
 
-    const handleSignup = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsLoading(true);
-        try {
-            const res = await auth.createUserWithEmailAndPassword(email, password);
-
-            if (res.user?.email) {
-                setEmail(res.user.email);
+    const handlePostSignUp = async (user: firebaseUser | null) => {
+        try{
+            if (user?.email) {
+                setEmail(user.email);
             }
 
-            if (res.user?.uid) {
-                setUid(res.user.uid);
+            if (user?.uid) {
                 // Call the API route to create a user using the fetch API
                 await fetch('/api/createUser', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ user: { email, uid: res.user.uid } })
+                    body: JSON.stringify({ user: { email: user.email, uid: user.uid } })
                 });
                 router.push('/');
             }
+        }catch (error){
+            console.log(error);
+            handleSignUpError(error);
+        }
+    }
+
+    const handleSignUpError = (error: any)=>{
+        console.log('Signup error:', error);
+        toast({
+            title: `${(error as Error).message}`,
+            status: 'error',
+            isClosable: true,
+        });
+    }
+
+    const handleGoogleSignIn = async ()=>{
+        setIsLoading(true);
+        try{
+            const res = await auth.signInWithPopup(GoogleProvider);
+            handlePostSignUp(res.user);
+        }catch(error){
+            handleSignUpError(error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    const handleSignup = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+        try {
+            const res = await auth.createUserWithEmailAndPassword(email, password);
+            handlePostSignUp(res.user);
         } catch (error) {
-            console.log('Signup error:', error);
-            toast({
-                title: `${(error as Error).message}`,
-                status: 'error',
-                isClosable: true,
-            });
-            // Handle signup error
+            handleSignUpError(error);
         } finally {
             setIsLoading(false);
         }
@@ -90,6 +112,11 @@ const Signup: React.FC = () => {
                         borderRadius={'xl'}
                     >
                         Sign Up
+                    </Button>
+                </Center>
+                <Center>
+                    <Button onClick={()=>{handleGoogleSignIn()}}>
+                        Sign in wit Google
                     </Button>
                 </Center>
             </form>

@@ -16,7 +16,7 @@ export default function Navbar() {
     return (
         <Flex as="nav" align="center" justify="space-around" p={4} fontWeight={"extrabold"}>
             <Link href="/">
-                <Image aria-label='N logo' src="./favicon.png" h="12" w="12"></Image>
+                <Image aria-label='N logo' src={'/favicon.png'} h="12" w="12"></Image>
             </Link>
             {isSmallScreen ? (
                 <Menu>
@@ -59,7 +59,7 @@ export default function Navbar() {
                             <Link aria-label='profile' href="/profile">
                                 <Avatar
                                     size="sm"
-                                    name={user.email}
+                                    name={user.email!}
                                     src={`https://api.dicebear.com/6.x/fun-emoji/svg?seed=${user.uid}`}
                                     mr={2}
                                 />

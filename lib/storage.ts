@@ -8,7 +8,7 @@ export const CookieConsent = (Cookies.get('cookies')!== "deny" && Cookies.get('c
 
 export const setCookies = (name: string,data: any) => {
     if (CookieConsent) {
-        Cookies.set(name, JSON.stringify(data));
+        Cookies.set(name, data);
     }
 };
 
