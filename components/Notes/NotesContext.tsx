@@ -5,7 +5,7 @@
  */
 
 import { getLocal, setLocal } from "@/lib/storage";
-import { Note } from "@/lib/types";
+import { Note, emptyNote } from "@/lib/types";
 import { ReactNode, SetStateAction, createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "../AuthContext";
 import { useApp } from "../AppContext";
@@ -15,7 +15,7 @@ interface NotesContextType {
     handleAddNote: (input: string) => Promise<void>,
     handleDelete: (note: Note) => Promise<void>,
     handleUpdateNote: (note: Note) => Promise<void>,
-    currentNote: Note | null,
+    currentNote: Note,
     SetCurrentNote: React.Dispatch<SetStateAction<Note | null>>
 }
 
@@ -28,13 +28,13 @@ interface NotesProviderProps {
 
 const NotesProvider: React.FC<NotesProviderProps> = ({ children }) => {
     const [notes, setNotes] = useState<Note[]>([]);
-    const [currentNote, SetCurrentNote] = useState<Note|null>(null);
+    const [currentNote, SetCurrentNote] = useState<Note>(emptyNote);
     const { user } = useAuth();
     const { handleError } = useApp();
 
-    // useEffect(()=>{
-    // console.log(currentNote);
-    // },[currentNote]);
+    useEffect(()=>{
+    console.log(currentNote);
+    },[currentNote]);
 
     useEffect(() => {
         setNotes(JSON.parse(getLocal('notes')) as Note[]);

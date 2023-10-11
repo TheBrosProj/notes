@@ -10,3 +10,5 @@ export type Note = {
     details: string;
     src: string | null;
 };
+
+export const emptyNote = {id: 0, details: "", src: ""};
