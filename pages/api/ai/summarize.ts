@@ -12,7 +12,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       thread.id,
       {
         role: "user",
-        content: `{ "text": "${req.body.text}", limit : ${req.body.word} }`,
+        content: req.body.text,
       }
     );
     let run = await openai.beta.threads.runs.createAndPoll(
@@ -26,7 +26,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       const messages = await openai.beta.threads.messages.list(
         run.thread_id
       );
-      let content = messages.data.reverse()[0].content[0]
+      let content = messages.data.reverse().filter((message: any) => message.role === "assistant")[0].content[0]
       if (content.type === "text") {
         console.log("content.text.value", content.text.value);
         return res.status(200).json({ text: content.text.value });
