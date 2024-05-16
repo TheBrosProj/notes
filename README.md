@@ -6,7 +6,7 @@ An application to gather thoughts and work on them
 - Pomodoro Timer
 - TODO list
 - Notes
-- UI slick AF
+- Slick UI
 
 ## TODO
 - Implement AI tools to common note taking scenarios like summarization and referencing
@@ -16,8 +16,26 @@ An application to gather thoughts and work on them
 - [x] Notes
 - [x] Todo  
 - [x] save projects to DB (PostgreSQL)
-- [ ] Extension to hyperlinks
-- [ ] Search, Content, YT video summarizer
+- [x] Text summarization  
+- [ ] Extension to hyperlinks (beta)
+- [ ] Search, Content, YT video summarizer (alpha)
+
+## Screenshots
+### Website at https://prod.nandanvarma.com
+![Website](screenshots/homepage.png)
+### deployment and testing at https://vercel.app
+![deployment](screenshots/deployment.png)
+### database at https://console.neon.tech
+![database](screenshots/database.png)
+
+## views
+- home (/)
+- about (/about)
+- notes (/notes)
+- beta (/beta)
+- profile (/profile)
+- notes with id (/auth_id/id) [ protected ]
+
 
 ## Getting Started
 
@@ -40,11 +58,12 @@ pnpm dev
 - API design
 - SQL Database with upgradability in mind
 
+extension built for this at https://github.com/TheBrosProj/extension
+
 
 ## Built with
 
-- [Next.js](https://nextjs.org)
+- [Next.js](https://nextjs.org) for webpages and apis
 - [chakra-ui](https://chakra-ui.com)
-- Deployed on [Vercel](https://vercel.com)
-- PostgreSQL
-- Deployed on [neon.tech](https://neon.tech/)
+- Webpage and apis deployed on [Vercel](https://vercel.com)
+- Postgresql Database Deployed on [neon.tech](https://neon.tech/)

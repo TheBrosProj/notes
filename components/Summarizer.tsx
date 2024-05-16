@@ -26,26 +26,24 @@ import OpenAI from "openai";
 const Summarizer: React.FC = () => {
     const [input, setInput] = useState<string>("");
     const [summary, setSummary] = useState<string | null>(null);
-    const [apikey, setApikey] = useState<string | null>(null);
     const [word, setWord] = useState<number>(100);
     const [showTooltip, setShowTooltip] = useState<boolean>(false);
 
+    const handleSummarize = async (text: string, word: number) => {
+        const response = await fetch("/api/ai/summarize", {
+            method: "POST",
+            body: JSON.stringify({ text: text, word: Number }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        const data = await response.json();
+        setSummary(data.text);
+    }
+
     const handleSubmit = async () => {
-        if (!apikey) {
-            return;
-        }
-        const openai = new OpenAI({
-            apiKey: apikey,
-        });
 
-        const chatCompletion = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo-16k",
-            messages: [{ role: "system", content: `You are a helpful assistant that summarizes transcript in around ${word} words .` }, { role: "user", content: input }],
-        });
-
-        const generatedSummary = chatCompletion.choices[0].message.content;
-
-        setSummary(generatedSummary);
+        await handleSummarize(input, word);
     };
 
     return (
@@ -61,15 +59,6 @@ const Summarizer: React.FC = () => {
                     boxShadow='lg'
                     overflowY="auto"
                 >
-                    <InputGroup
-                        p={'4'} marginBottom={'2'}
-                    >
-                        <Input
-                            placeholder="Add OpenAI API key"
-                            value={apikey || ''}
-                            onChange={(e) => setApikey(e.target.value)}
-                        />
-                    </InputGroup>
                     <Center>
                         <Textarea
                             w={'md'}
