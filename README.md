@@ -7,6 +7,7 @@ An application to gather thoughts and work on them
 - TODO list
 - Notes
 - Slick UI
+- AI (of course its 2024 what do you expect)
 
 ## TODO
 - Implement AI tools to common note taking scenarios like summarization and referencing
@@ -27,6 +28,8 @@ An application to gather thoughts and work on them
 ![deployment](screenshots/deployment.png)
 ### database at https://console.neon.tech
 ![database](screenshots/database.png)
+### AI tools at https://platform.openai.com
+![AI](screenshots/AI.png)
 
 ## views
 - home (/)
@@ -57,6 +60,7 @@ pnpm dev
 - Multi Platform support
 - API design
 - SQL Database with upgradability in mind
+- AI assistants
 
 extension built for this at https://github.com/TheBrosProj/extension
 
@@ -67,3 +71,4 @@ extension built for this at https://github.com/TheBrosProj/extension
 - [chakra-ui](https://chakra-ui.com)
 - Webpage and apis deployed on [Vercel](https://vercel.com)
 - Postgresql Database Deployed on [neon.tech](https://neon.tech/)
+- AI assistants hosted at [OpenAI](https://openai.com)
