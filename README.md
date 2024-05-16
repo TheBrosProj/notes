@@ -64,7 +64,11 @@ pnpm dev
 - SQL Database with upgradability in mind
 - AI assistants
 
-extension built for this at https://github.com/TheBrosProj/extension
+chrome extension built for this at https://github.com/TheBrosProj/extension to handle note addition with from right click context menu in browser.
+
+### Note: 
+
+previously hosted at https://github.com/TheBrosProj/frontend but archived as project differed from its original goal as stack changed from JS to TS; previously unstable Nextjs AppDir to Nextjs Pages router and removed [tauri](https://tauri.app) web application feature as it is not feature complete
 
 
 ## Built with

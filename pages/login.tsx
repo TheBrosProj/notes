@@ -45,6 +45,7 @@ const Login: React.FC = () => {
         setIsLoading(true);
         try{
             const res = await auth.signInWithPopup(GoogleProvider);
+            router.push('/');
         } finally {
             setIsLoading(false);
         }
