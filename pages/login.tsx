@@ -15,7 +15,7 @@ import {
     Button,
     Center,
 } from '@chakra-ui/react';
-import { GoogleProvider, auth } from '@/lib/firebase';
+import { GoogleProvider, auth, firebaseUser } from '@/lib/firebase';
 
 const Login: React.FC = () => {
     const router = useRouter();
@@ -45,9 +45,33 @@ const Login: React.FC = () => {
         setIsLoading(true);
         try{
             const res = await auth.signInWithPopup(GoogleProvider);
-            router.push('/');
+            handlePostSignUp(res.user);
+        }catch(error){
+            console.error(error);
         } finally {
             setIsLoading(false);
+        }
+    }
+
+    const handlePostSignUp = async (user: firebaseUser | null) => {
+        try{
+            if (user?.email) {
+                setEmail(user.email);
+            }
+
+            if (user?.uid) {
+                // Call the API route to create a user using the fetch API
+                await fetch('/api/createUser', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ user: { email: user.email, uid: user.uid } })
+                });
+            }
+            router.push('/');
+        }catch (error){
+            console.log(error);
         }
     }
 
