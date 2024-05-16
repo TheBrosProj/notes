@@ -28,6 +28,8 @@ An application to gather thoughts and work on them
 ![deployment](screenshots/deployment.png)
 ### database at https://console.neon.tech
 ![database](screenshots/database.png)
+### authentication
+![authentication](screenshots/authentication.png)
 ### AI tools at https://platform.openai.com
 ![AI](screenshots/AI.png)
 
@@ -71,4 +73,5 @@ extension built for this at https://github.com/TheBrosProj/extension
 - [chakra-ui](https://chakra-ui.com)
 - Webpage and apis deployed on [Vercel](https://vercel.com)
 - Postgresql Database Deployed on [neon.tech](https://neon.tech/)
+- Authentication using [Google Firebase](https://console.firebase.google.com)
 - AI assistants hosted at [OpenAI](https://openai.com)

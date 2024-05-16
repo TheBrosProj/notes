@@ -40,8 +40,8 @@ const Signup: React.FC = () => {
                     },
                     body: JSON.stringify({ user: { email: user.email, uid: user.uid } })
                 });
-                router.push('/');
             }
+            router.push('/');
         }catch (error){
             console.log(error);
             handleSignUpError(error);
@@ -116,7 +116,7 @@ const Signup: React.FC = () => {
                 </Center>
                 <Center>
                     <Button onClick={()=>{handleGoogleSignIn()}}>
-                        Sign in wit Google
+                        Sign in with Google
                     </Button>
                 </Center>
             </form>

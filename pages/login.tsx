@@ -15,7 +15,7 @@ import {
     Button,
     Center,
 } from '@chakra-ui/react';
-import { auth } from '@/lib/firebase';
+import { GoogleProvider, auth } from '@/lib/firebase';
 
 const Login: React.FC = () => {
     const router = useRouter();
@@ -40,6 +40,15 @@ const Login: React.FC = () => {
             setIsLoading(false);
         }
     };
+
+    const handleGoogleSignIn = async ()=>{
+        setIsLoading(true);
+        try{
+            const res = await auth.signInWithPopup(GoogleProvider);
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
     return (
         <Box maxW="sm" mx="auto" mt={8} p={4}>
@@ -72,6 +81,11 @@ const Login: React.FC = () => {
                         borderRadius={'xl'}
                     >
                         Log In
+                    </Button>
+                </Center>
+                <Center>
+                    <Button onClick={()=>{handleGoogleSignIn()}}>
+                        Sign in with Google
                     </Button>
                 </Center>
             </form>
